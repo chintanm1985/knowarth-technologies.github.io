@@ -72,7 +72,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* STAT PILLS */
 .srow{display:flex;gap:8px;margin-bottom:11px;flex-wrap:wrap}
-.sp{flex:1;min-width:65px;border-radius:9px;padding:8px 10px;text-align:center}
+.sp{flex:1;min-width:65px;border-radius:9px;padding:8px 10px;text-align:center;cursor:pointer;transition:outline .15s,box-shadow .15s;user-select:none}
+.sp:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.sp.sp-active{outline:2.5px solid currentColor;outline-offset:2px;box-shadow:0 0 0 3px rgba(0,0,0,.06)}
 .sp .n{font-size:24px;font-weight:700;line-height:1}
 .sp .l{font-size:9.5px;margin-top:2px;opacity:.8}
 
@@ -121,13 +123,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .xbtn{cursor:pointer;color:var(--teal);font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(10,126,140,.07);transition:background .13s;user-select:none}
 .xbtn:hover{background:rgba(10,126,140,.15)}
 
-/* BGV SUMMARY BOXES */
-.bgv-sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-.bgv-box{border-radius:9px;padding:12px 14px;border:1.5px solid var(--border);background:#FAFCFF;cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none}
-.bgv-box:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(0,0,0,.07)}
-.bgv-box.bgv-active{border-color:var(--navy);box-shadow:0 0 0 2.5px var(--navy)}
-.bgv-box-title{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.bgv-stage-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+/* BGV SUMMARY — uses .srow / .sp (shared pill styles) */
 .bgv-stat-row{display:flex;gap:6px;margin-bottom:10px}
 .bgv-stat{flex:1;text-align:center;border-radius:7px;padding:7px 3px}
 .bgv-stat .sv{font-size:19px;font-weight:700;line-height:1}
@@ -196,8 +192,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .onb-section{margin-bottom:14px}
 .onb-phase-hdr{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:5px 8px;border-radius:6px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 
-@media(max-width:900px){.grid{grid-template-columns:1fr}.grid .s2{grid-column:1}.kpi-strip{grid-template-columns:repeat(2,1fr)}.bgv-sum{grid-template-columns:1fr}.tcol{grid-template-columns:1fr}.dept-act-grid{grid-template-columns:1fr}.pyramid-wrap{flex-direction:column}}
-@media(max-width:1100px){.bgv-sum{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.grid .s2{grid-column:1}.kpi-strip{grid-template-columns:repeat(2,1fr)}.tcol{grid-template-columns:1fr}.dept-act-grid{grid-template-columns:1fr}.pyramid-wrap{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -351,24 +346,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <span class="chev">▼</span>
     </div>
     <div class="cbody" id="b-ld">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Click any KPI card below to expand items by status</div>
       <div class="srow" id="ld-stats"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:2px">
-        <div class="tbar" style="margin-bottom:0;border-bottom:none">
-          <button class="tbtn on" onclick="swt('ld','setup',this)">Program Setup</button>
-          <button class="tbtn" onclick="swt('ld','c1',this)">Cohort 1</button>
-          <button class="tbtn" onclick="swt('ld','c2',this)">Cohort 2</button>
-        </div>
-        <div class="kpi-sf" id="ld-status-sf" style="margin-bottom:0">
-          <button class="on" style="border-color:var(--purple);color:var(--purple)" onclick="setLDTabFilter('all',this)">All</button>
-          <button onclick="setLDTabFilter('Done',this)">✅ Done</button>
-          <button onclick="setLDTabFilter('InProgress',this)">🔄 In Progress</button>
-          <button onclick="setLDTabFilter('Open',this)">⭕ Open</button>
-        </div>
-      </div>
-      <div style="border-bottom:2px solid var(--border);margin-bottom:12px"></div>
-      <div id="ld-setup" class="tpanel on"><ul class="tl" id="ld-setup-list"></ul></div>
-      <div id="ld-c1"    class="tpanel"><ul class="tl" id="ld-c1-list"></ul></div>
-      <div id="ld-c2"    class="tpanel"><ul class="tl" id="ld-c2-list"></ul></div>
+      <div id="ld-detail" style="display:none;margin-top:6px"></div>
     </div>
   </div>
 
@@ -379,26 +359,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <span class="chev">▼</span>
     </div>
     <div class="cbody" id="b-it">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Click any KPI card below to expand items by status</div>
       <div class="srow" id="it-stats"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:2px">
-        <div class="tbar" style="margin-bottom:0;border-bottom:none">
-          <button class="tbtn on" onclick="swt('it','sec',this)">Security &amp; Access</button>
-          <button class="tbtn" onclick="swt('it','ep',this)">Endpoint &amp; Network</button>
-          <button class="tbtn" onclick="swt('it','lap',this)">Laptop &amp; VDI</button>
-          <button class="tbtn" onclick="swt('it','sup',this)">Support &amp; Day-0</button>
-        </div>
-        <div class="kpi-sf" id="it-status-sf" style="margin-bottom:0">
-          <button class="on" style="border-color:var(--teal);color:var(--teal)" onclick="setITTabFilter('all',this)">All</button>
-          <button onclick="setITTabFilter('Done',this)">✅ Done</button>
-          <button onclick="setITTabFilter('InProgress',this)">🔄 In Progress</button>
-          <button onclick="setITTabFilter('Open',this)">⭕ Open</button>
-        </div>
-      </div>
-      <div style="border-bottom:2px solid var(--border);margin-bottom:12px"></div>
-      <div id="it-sec" class="tpanel on"><ul class="tl" id="it-sec-l"></ul></div>
-      <div id="it-ep"  class="tpanel"><ul class="tl" id="it-ep-l"></ul></div>
-      <div id="it-lap" class="tpanel"><ul class="tl" id="it-lap-l"></ul></div>
-      <div id="it-sup" class="tpanel"><ul class="tl" id="it-sup-l"></ul></div>
+      <div id="it-detail" style="display:none;margin-top:6px"></div>
     </div>
   </div>
 
@@ -410,8 +373,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
     <div class="cbody" id="b-hr">
       <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Click any phase card below to expand resource details</div>
-      <div class="bgv-sum" id="bgv-sum"></div>
-      <!-- Inline detail panel — populated on bgv-box click -->
+      <div class="srow" id="bgv-sum"></div>
+      <!-- Inline detail panel — populated on bgv pill click -->
       <div id="bgv-detail" style="display:none;margin-top:10px"></div>
     </div>
   </div>
@@ -554,7 +517,7 @@ function fsBadge(s){
 }
 function pbar(d,t,col='var(--teal)'){
   const p=t?Math.round(d/t*100):0;
-  return`<div style="display:flex;align-items:center;gap:5px"><div class="pw" style="flex:1"><div class="pf" style="width:${p}%;background:${col}"></div></div><span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;width:38px">${d}/${t}</span></div>`;
+  return`<div style="display:flex;align-items:center;gap:5px"><div class="pw" style="flex:1"><div class="pf" style="width:${p}%;background:${col}"></div></div><span style="font-size:10px;font-weight:600;font-family:'DM Mono',monospace;width:34px;text-align:right;color:${col}">${p}%</span></div>`;
 }
 function tli(lbl,s,owner){
   const c={Done:'var(--green)',InProgress:'var(--amber)',Open:'var(--slate)'}[s]||'var(--slate)';
@@ -638,9 +601,11 @@ function renderHiring(){
     <div class="sleg-i"><div class="sdot" style="background:#C7D2E8"></div>${tot?Math.round(wip/tot*100):0}% WIP</div>`;
   // Cohort table — Onboarded | Offer Accepted | WIP order
   const show=ACF==='all'?[1,2,3,4]:[ACF];
+  // Apply HM filter to per-row cohort numbers (same as filt() but cohort-split)
+  const hmBase=ACHMF==='all'?H:H.filter(r=>r.hm===ACHMF);
   let html='';
   show.forEach(c=>{
-    const cr=H.filter(r=>coh(r)===c);
+    const cr=hmBase.filter(r=>coh(r)===c);
     const nb=cr.filter(r=>r.fs==='3.Onboarded').length;
     const of=cr.filter(r=>r.fs==='2.Offer Accepted').length;
     const w=cr.filter(r=>r.fs==='1.WIP').length;
@@ -726,9 +691,9 @@ function togglePyrExp(){
 // ═══════════════════ 2. L&D ═══════════════════
 function renderLD(){
   document.getElementById('ld-stats').innerHTML=`
-    <div class="sp" style="background:var(--greenlt)"><div class="n" style="color:var(--green)">6</div><div class="l" style="color:var(--green)">Done</div></div>
-    <div class="sp" style="background:var(--amberlt)"><div class="n" style="color:var(--amber)">4</div><div class="l" style="color:var(--amber)">In Progress</div></div>
-    <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--muted)">2</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+    <div class="sp" style="background:var(--greenlt)" onclick="filterLDByStatus('Done',this)"><div class="n" style="color:var(--green)">6</div><div class="l" style="color:var(--green)">Done</div></div>
+    <div class="sp" style="background:var(--amberlt)" onclick="filterLDByStatus('InProgress',this)"><div class="n" style="color:var(--amber)">4</div><div class="l" style="color:var(--amber)">In Progress</div></div>
+    <div class="sp" style="background:#F1F5F9" onclick="filterLDByStatus('Open',this)"><div class="n" style="color:var(--muted)">2</div><div class="l" style="color:var(--muted)">Open</div></div>`;
   const setup=[
     ['Training Program Outline & Success Criteria','Done','Abhishek S.'],
     ['ACX Overview, Culture & Ways of Working','Done','Deb S.'],
@@ -761,18 +726,16 @@ function renderLD(){
     ['Transition to Hands-on Roles (C2)','Open','Chintan M.'],
     ['Track Performance (C2)','Open','Chintan M.'],
   ];
-  _ldSetup=setup; _ldC1=c1; _ldC2=c2; LD_TAB_FILTER='all';
-  document.getElementById('ld-setup-list').innerHTML=setup.map(([l,s,o])=>tli(l,s,o)).join('');
-  document.getElementById('ld-c1-list').innerHTML=c1.map(([l,s,o])=>tli(l,s,o)).join('');
-  document.getElementById('ld-c2-list').innerHTML=c2.map(([l,s,o])=>tli(l,s,o)).join('');
+  _ldSetup=setup; _ldC1=c1; _ldC2=c2; _LD_ACTIVE=null;
+  document.getElementById('ld-detail').style.display='none';
 }
 
 // ═══════════════════ 3. IT ═══════════════════
 function renderIT(){
   document.getElementById('it-stats').innerHTML=`
-    <div class="sp" style="background:var(--greenlt)"><div class="n" style="color:var(--green)">1</div><div class="l" style="color:var(--green)">Done</div></div>
-    <div class="sp" style="background:var(--amberlt)"><div class="n" style="color:var(--amber)">14</div><div class="l" style="color:var(--amber)">In Progress</div></div>
-    <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--muted)">0</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+    <div class="sp" style="background:var(--greenlt)" onclick="filterITByStatus('Done',this)"><div class="n" style="color:var(--green)">1</div><div class="l" style="color:var(--green)">Done</div></div>
+    <div class="sp" style="background:var(--amberlt)" onclick="filterITByStatus('InProgress',this)"><div class="n" style="color:var(--amber)">14</div><div class="l" style="color:var(--amber)">In Progress</div></div>
+    <div class="sp" style="background:#F1F5F9" onclick="filterITByStatus('Open',this)"><div class="n" style="color:var(--muted)">0</div><div class="l" style="color:var(--muted)">Open</div></div>`;
   const cats={
     'it-sec-l':[
       ['Infrastructure & Setup (overall)','InProgress','Amij P.'],
@@ -798,10 +761,8 @@ function renderIT(){
       ['Day-0 Checklist','InProgress','Dhaval R.'],
     ],
   };
-  _itItems=cats; IT_TAB_FILTER='all';
-  Object.entries(cats).forEach(([id,items])=>{
-    document.getElementById(id).innerHTML=items.map(([l,s,o])=>tli(l,s,o)).join('');
-  });
+  _itItems=cats; _IT_ACTIVE=null;
+  document.getElementById('it-detail').style.display='none';
 }
 
 // ═══════════════════ 4. HR & BGV ═══════════════════
@@ -809,34 +770,28 @@ let _BGV_ACTIVE=null;
 
 function renderBGVBoxes(filtered){
   const src=filtered||H;
-  function box(rows,lbl,phase,accentCol){
-    const s1={done:0,wip:0,open:0},s2={done:0,wip:0,open:0};
-    rows.forEach(r=>{s1[normB(r.b1)]++;s2[normB(r.b2)]++;});
-    return`<div class="bgv-box" id="bgv-box-${phase}" onclick="toggleBGVDetail('${phase}',this)">
-      <div class="bgv-box-title"><span style="color:${accentCol}">${lbl}</span><span style="font-size:10px;color:var(--muted);font-weight:400">${rows.length} resources ▾</span></div>
-      <div class="bgv-stage-lbl">BGV Stage 1</div>
-      <div class="bgv-stat-row">
-        <div class="bgv-stat" style="background:var(--greenlt)"><div class="sv" style="color:var(--green)">${s1.done}</div><div class="sl" style="color:var(--green)">Done</div></div>
-        <div class="bgv-stat" style="background:var(--amberlt)"><div class="sv" style="color:var(--amber)">${s1.wip}</div><div class="sl" style="color:var(--amber)">WIP</div></div>
-        <div class="bgv-stat" style="background:#F1F5F9"><div class="sv" style="color:var(--slate)">${s1.open}</div><div class="sl" style="color:var(--slate)">Open</div></div>
-      </div>
-      <div class="bgv-stage-lbl">BGV Stage 2</div>
-      <div class="bgv-stat-row">
-        <div class="bgv-stat" style="background:var(--greenlt)"><div class="sv" style="color:var(--green)">${s2.done}</div><div class="sl" style="color:var(--green)">Done</div></div>
-        <div class="bgv-stat" style="background:var(--amberlt)"><div class="sv" style="color:var(--amber)">${s2.wip}</div><div class="sl" style="color:var(--amber)">WIP</div></div>
-        <div class="bgv-stat" style="background:#F1F5F9"><div class="sv" style="color:var(--slate)">${s2.open}</div><div class="sl" style="color:var(--slate)">Open</div></div>
-      </div>
-    </div>`;
-  }
   const p1=src.filter(r=>r.fs==='3.Onboarded');
   const p2=src.filter(r=>r.fs==='2.Offer Accepted');
   const p3=src.filter(r=>r.fs==='1.WIP');
   _p1Rows=p1; _p2Rows=p2; _p3Rows=p3;
   _BGV_ACTIVE=null;
+  function stg(rows){
+    const s1={done:0,wip:0,open:0},s2={done:0,wip:0,open:0};
+    rows.forEach(r=>{s1[normB(r.b1)]++;s2[normB(r.b2)]++;});
+    return{s1,s2};
+  }
+  function stageMini(s1,s2){
+    const chip=(n,col,bg)=>`<span style="background:${bg};color:${col};font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px">${n}</span>`;
+    return`<div style="margin-top:7px;font-size:9.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px">BGV Stage 1</div>`+
+      `<div style="display:flex;gap:3px;margin:2px 0 5px">${chip('✓ '+s1.done,'var(--green)','var(--greenlt)')}${chip('~ '+s1.wip,'var(--amber)','var(--amberlt)')}${chip('○ '+s1.open,'var(--slate)','#F1F5F9')}</div>`+
+      `<div style="font-size:9.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px">BGV Stage 2</div>`+
+      `<div style="display:flex;gap:3px;margin-top:2px">${chip('✓ '+s2.done,'var(--green)','var(--greenlt)')}${chip('~ '+s2.wip,'var(--amber)','var(--amberlt)')}${chip('○ '+s2.open,'var(--slate)','#F1F5F9')}</div>`;
+  }
+  const g1=stg(p1), g2=stg(p2), g3=stg(p3);
   document.getElementById('bgv-sum').innerHTML=
-    box(p1,'✅ Onboarded','p1','var(--green)')+
-    box(p2,'📋 Offer Accepted','p2','var(--amber)')+
-    box(p3,'🔄 WIP','p3','var(--indigo)');
+    `<div class="sp" style="background:var(--greenlt);text-align:left;min-width:140px" onclick="toggleBGVDetail('p1',this)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="n" style="color:var(--green)">${p1.length}</div><div class="l" style="color:var(--green);margin-top:4px">✅ Onboarded</div></div>${stageMini(g1.s1,g1.s2)}</div>`+
+    `<div class="sp" style="background:var(--amberlt);text-align:left;min-width:140px" onclick="toggleBGVDetail('p2',this)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="n" style="color:var(--amber)">${p2.length}</div><div class="l" style="color:var(--amber);margin-top:4px">📋 Offer Accepted</div></div>${stageMini(g2.s1,g2.s2)}</div>`+
+    `<div class="sp" style="background:var(--indigolt);text-align:left;min-width:140px" onclick="toggleBGVDetail('p3',this)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="n" style="color:var(--indigo)">${p3.length}</div><div class="l" style="color:var(--indigo);margin-top:4px">🔄 WIP</div></div>${stageMini(g3.s1,g3.s2)}</div>`;
   const det=document.getElementById('bgv-detail');
   if(det) det.style.display='none';
 }
@@ -844,12 +799,12 @@ function renderBGVBoxes(filtered){
 function toggleBGVDetail(phase, el){
   const det=document.getElementById('bgv-detail');
   if(!det) return;
-  // Remove active from all boxes
-  document.querySelectorAll('.bgv-box').forEach(b=>b.classList.remove('bgv-active'));
+  // Remove active from all pills
+  document.querySelectorAll('#bgv-sum .sp').forEach(s=>s.classList.remove('sp-active'));
   // Toggle off if same phase clicked again
   if(_BGV_ACTIVE===phase){ det.style.display='none'; _BGV_ACTIVE=null; return; }
   _BGV_ACTIVE=phase;
-  if(el) el.classList.add('bgv-active');
+  if(el) el.classList.add('sp-active');
   // Build detail content
   let hdr='', thead='', tbId='bgv-det-tbody';
   if(phase==='p1'){
@@ -1074,72 +1029,127 @@ function renderProg(){
   const total=PROG_C1.length;
   const pct=Math.round(done/total*100);
 
+  // ── Donut + fraction ──
   document.getElementById('dpct').textContent=pct+'%';
   document.getElementById('prog-frac').innerHTML=`${done} <span style="font-size:13px;font-weight:400;color:var(--muted)">of ${total}</span>`;
-  document.getElementById('prog-pills').innerHTML=`
-    <div class="sp" style="background:var(--greenlt)"><div class="n" style="color:var(--green);font-size:19px">${done}</div><div class="l" style="color:var(--green)">Done</div></div>
-    <div class="sp" style="background:var(--amberlt)"><div class="n" style="color:var(--amber);font-size:19px">${inp}</div><div class="l" style="color:var(--amber)">In Progress</div></div>
-    <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--muted);font-size:19px">${open}</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+  setTimeout(()=>{const c=2*Math.PI*30;document.getElementById('darc').setAttribute('stroke-dasharray',(c*pct/100)+' '+(c*(1-pct/100)));},400);
 
-  const expBtn=document.getElementById('prog-expand-btn');
-  if(expBtn){const plan=PROG_C1.filter(r=>r.src==='plan').length,ai=PROG_C1.filter(r=>r.src==='action_items').length;expBtn.innerHTML='&#9657; Show Full Detail ('+plan+' plan + '+ai+' actions)';}
-
-  // Workstream bars
-  const WS=[
-    {l:'Preparation & Contracts', keys:['preparation','finalize offshore','local leadership','sign contract']},
-    {l:'IT Infrastructure',       keys:['infrastructure','security','identity','endpoint','network','application control','data protection','logging','user support','laptop','golden image','vdi','day-0']},
-    {l:'Talent Development',      keys:['talent development','training program','prepare training','acx overview','core work','technology deep','define mentor','identify us mentor','define 30','identify us cohort','build mentor']},
-    {l:'Talent Acquisition',      keys:['talent acquisition','define roles','conduct interview','establish success','jd mapping','jd discussion','interview panel','pipeline velocity']},
-    {l:'Onboarding & Ramp-up',    keys:['onboarding','resources joined','boot camp','introduce to mentor','shadow','transition to hands','track performance','operations & governance','raci','governance dashboard']},
-  ];
-  const colors=['var(--green)','var(--teal)','var(--purple)','var(--amber)','var(--indigo)'];
-  const wsStats=WS.map((w,i)=>{
-    const items=PROG_C1.filter(r=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
-    const d=items.filter(r=>r.s==='Done').length;
-    const t=items.length||1;
-    return{...w,d,t,c:colors[i]};
-  });
-  document.getElementById('prog-bars').innerHTML=wsStats.map(w=>`
-    <div class="pi">
-      <div class="pl">${w.l}</div>
-      <div class="pbw"><div class="pw"><div class="pf" style="width:${Math.round(w.d/w.t*100)}%;background:${w.c}"></div></div></div>
-      <div class="pc">${w.d}/${w.t}</div>
-    </div>`).join('');
-
-  // Key alerts — overdue items
+  // ── Dynamic RAG health badge ──
   const today=new Date().toISOString().slice(0,10);
   const overdue=PROG_C1.filter(r=>r.s!=='Done'&&r.e&&r.e<today&&/^\d{4}/.test(r.e));
+  const rag = overdue.length>3||pct<30
+    ? {bg:'#FEE2E2',border:'#FCA5A5',text:'#DC2626',icon:'🔴',lbl:'At Risk'}
+    : overdue.length>0||pct<60
+      ? {bg:'#FEF3C7',border:'#FCD34D',text:'#B45309',icon:'🟡',lbl:'Needs Attention'}
+      : {bg:'#D1FAE5',border:'#6EE7B7',text:'#065F46',icon:'🟢',lbl:'On Track'};
+
+  // ── Pills row with RAG ──
+  document.getElementById('prog-pills').innerHTML=
+    `<div style="display:inline-flex;align-items:center;gap:5px;background:${rag.bg};border:1.5px solid ${rag.border};border-radius:20px;padding:5px 12px;margin-right:6px">
+       <span style="font-size:13px">${rag.icon}</span>
+       <span style="font-size:12px;font-weight:700;color:${rag.text}">${rag.lbl}</span>
+     </div>`+
+    `<div class="sp" style="background:var(--greenlt);min-width:52px"><div class="n" style="color:var(--green);font-size:18px">${done}</div><div class="l" style="color:var(--green)">Done</div></div>`+
+    `<div class="sp" style="background:var(--amberlt);min-width:52px"><div class="n" style="color:var(--amber);font-size:18px">${inp}</div><div class="l" style="color:var(--amber)">In Progress</div></div>`+
+    `<div class="sp" style="background:#F1F5F9;min-width:52px"><div class="n" style="color:var(--muted);font-size:18px">${open}</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+
+  // ── Workstream bars — % with RAG color coding ──
+  const WS=[
+    {l:'Preparation & Contracts', icon:'📄', keys:['preparation','finalize offshore','local leadership','sign contract']},
+    {l:'IT Infrastructure',       icon:'💻', keys:['infrastructure','security','identity','endpoint','network','application control','data protection','logging','user support','laptop','golden image','vdi','day-0']},
+    {l:'Talent Development',      icon:'📚', keys:['talent development','training program','prepare training','acx overview','core work','technology deep','define mentor','identify us mentor','define 30','identify us cohort','build mentor']},
+    {l:'Talent Acquisition',      icon:'🎯', keys:['talent acquisition','define roles','conduct interview','establish success','jd mapping','jd discussion','interview panel','pipeline velocity']},
+    {l:'Onboarding & Ramp-up',    icon:'🚀', keys:['onboarding','resources joined','boot camp','introduce to mentor','shadow','transition to hands','track performance','operations & governance','raci','governance dashboard']},
+  ];
+  const wsStats=WS.map(w=>{
+    const items=PROG_C1.filter(r=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
+    const d=items.filter(r=>r.s==='Done').length;
+    const ip=items.filter(r=>r.s==='InProgress').length;
+    const t=items.length||1;
+    const p=Math.round(d/t*100);
+    const col=p>=70?'var(--green)':p>=30?'var(--amber)':'#EF4444';
+    return{...w,d,ip,t,p,col};
+  });
+  document.getElementById('prog-bars').innerHTML=wsStats.map(w=>`
+    <div class="pi" style="align-items:center">
+      <div class="pl" style="display:flex;align-items:center;gap:4px"><span>${w.icon}</span>${w.l}</div>
+      <div class="pbw">
+        <div class="pw">
+          <div class="pf" style="width:${w.p}%;background:${w.col}"></div>
+        </div>
+      </div>
+      <div class="pc" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
+        <span style="font-weight:700;color:${w.col};font-family:'DM Mono',monospace;font-size:11px">${w.p}%</span>
+        <span style="font-size:9.5px;color:var(--muted)">${w.d}/${w.t} done</span>
+      </div>
+    </div>`).join('');
+
+  // ── Overdue alerts ──
   const alertEl=document.getElementById('prog-alerts');
   if(overdue.length>0){
-    alertEl.innerHTML='<div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:9px 13px;margin-bottom:2px">'+
-      '<div style="font-size:10.5px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">&#9888;&#65039; Attention Required &mdash; '+overdue.length+' item'+(overdue.length>1?'s':'')+' past ETA</div>'+
-      overdue.slice(0,5).map(r=>'<div style="font-size:12px;color:#78350F;padding:3px 0;border-bottom:1px solid #FDE68A;display:flex;justify-content:space-between;align-items:center">'+
-        '<span>'+(r.a.length>70?r.a.slice(0,70)+'&hellip;':r.a)+'</span>'+
-        '<span style="font-family:\'DM Mono\',monospace;font-size:10.5px;color:#B45309;margin-left:12px;white-space:nowrap">'+r.e+' &middot; '+(r.o||r.r)+'</span>'+
+    alertEl.innerHTML=
+      '<div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:9px 13px;margin-bottom:8px">'+
+      '<div style="font-size:10.5px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">⚠️ '+overdue.length+' item'+(overdue.length>1?'s':'')+' past ETA — Action Required</div>'+
+      overdue.slice(0,4).map(r=>'<div style="font-size:11.5px;color:#78350F;padding:4px 0;border-bottom:1px solid #FDE68A;display:flex;justify-content:space-between;align-items:center;gap:8px">'+
+        '<span style="flex:1">'+(r.a.length>65?r.a.slice(0,65)+'…':r.a)+'</span>'+
+        '<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:#B45309;white-space:nowrap;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;padding:1px 5px">'+r.e+'</span>'+
+        '<span style="font-size:10.5px;color:var(--muted);white-space:nowrap">'+(r.o||r.r)+'</span>'+
       '</div>').join('')+
-      (overdue.length>5?'<div style="font-size:10.5px;color:var(--muted);margin-top:5px">+'+(overdue.length-5)+' more &mdash; expand detail below</div>':'')+
-    '</div>';
+      (overdue.length>4?'<div style="font-size:10.5px;color:var(--muted);margin-top:5px;font-style:italic">+'+(overdue.length-4)+' more — see full detail below</div>':'')+
+      '</div>';
   } else { alertEl.innerHTML=''; }
 
-  // In-Progress spotlight
-  const inpItems=PROG_C1.filter(r=>r.s==='InProgress').slice(0,6);
+  // ── In-Progress: compact labeled chips ──
+  const inpItems=PROG_C1.filter(r=>r.s==='InProgress');
   const spotEl=document.getElementById('prog-spotlight');
   if(inpItems.length>0){
-    spotEl.innerHTML='<div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">&#128260; Currently In Progress</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
-      inpItems.map(r=>'<div style="background:#FFF8ED;border:1px solid #FDE68A;border-radius:7px;padding:7px 10px">'+
-        '<div style="font-size:12px;font-weight:500;color:var(--text)">'+(r.a.length>55?r.a.slice(0,55)+'&hellip;':r.a)+'</div>'+
-        '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+(r.o||'&mdash;')+' &middot; ETA '+(r.e||'&mdash;')+'</div>'+
-      '</div>').join('')+
-    '</div>';
+    // Group by workstream
+    const grouped={};
+    inpItems.forEach(r=>{
+      const ws=WS.find(w=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
+      const grp=ws?ws.icon+' '+ws.l:'📌 Other';
+      if(!grouped[grp]) grouped[grp]=[];
+      grouped[grp].push(r);
+    });
+    let html='<div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔄 In Progress by Workstream</div>';
+    Object.entries(grouped).forEach(([grp,items])=>{
+      html+=`<div style="margin-bottom:8px">`;
+      html+=`<div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">${grp}</div>`;
+      html+=`<div style="display:flex;flex-wrap:wrap;gap:4px">`;
+      items.forEach(r=>{
+        const eta=r.e&&/^\d{4}/.test(r.e)?` · ${r.e}`:'';
+        html+=`<span style="background:#FFF8ED;border:1px solid #FDE68A;border-radius:5px;padding:3px 8px;font-size:11px;color:var(--text)">${r.a.length>48?r.a.slice(0,48)+'…':r.a}<span style="color:var(--muted);font-size:10px">${eta}</span></span>`;
+      });
+      html+=`</div></div>`;
+    });
+    spotEl.innerHTML=html;
   } else { spotEl.innerHTML=''; }
 
-  // Full task detail table (collapsed)
+  // ── Upcoming ETAs (next 3 open/in-progress items with future dates) ──
+  const upcoming=PROG_C1.filter(r=>r.s!=='Done'&&r.e&&r.e>=today&&/^\d{4}/.test(r.e))
+    .sort((a,b)=>a.e.localeCompare(b.e)).slice(0,4);
+  const upEl=document.getElementById('prog-upcoming');
+  if(upEl){
+    if(upcoming.length>0){
+      upEl.innerHTML='<div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">📅 Next Due</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:5px">'+
+        upcoming.map(r=>`<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:4px 9px;font-size:11px">
+          <span style="font-weight:600;color:var(--navy)">${r.a.length>45?r.a.slice(0,45)+'…':r.a}</span>
+          <span style="color:var(--teal);font-family:'DM Mono',monospace;font-size:10px;margin-left:5px">${r.e}</span>
+          <span style="color:var(--muted);font-size:10px;margin-left:4px">· ${r.o||r.r||'—'}</span>
+        </div>`).join('')+
+        '</div>';
+    } else { upEl.innerHTML=''; }
+  }
+
+  // ── Expand button label ──
+  const expBtn=document.getElementById('prog-expand-btn');
+  if(expBtn){const plan=PROG_C1.filter(r=>r.src==='plan').length,ai=PROG_C1.filter(r=>r.src==='action_items').length;expBtn.innerHTML='&#9657; Show Full Detail ('+plan+' plan items · '+ai+' actions)';}
+
+  // ── Full task detail table (collapsed) ──
   const _pgTbl=document.getElementById('prog-tbody');
   if(_pgTbl) _pgTbl.setAttribute('data-filter','all');
   _renderProgRows('all');
-
-  setTimeout(()=>{const c=2*Math.PI*30;document.getElementById('darc').setAttribute('stroke-dasharray',(c*pct/100)+' '+(c*(1-pct/100)));},500);
 }
 
 function toggleProgDetail(){
@@ -1222,13 +1232,6 @@ function tog(id){
   document.getElementById('c-'+id).querySelector('.card-hdr').classList.toggle('coll',!CS[id]);
 }
 
-// ═══════════════════ TABS ═══════════════════
-function swt(sec,tab,btn){
-  document.querySelectorAll(`#b-${sec} .tbtn`).forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll(`#b-${sec} .tpanel`).forEach(p=>p.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById(`${sec}-${tab}`).classList.add('on');
-}
 
 // ═══════════════════ PROGRAM TAB FILTER ═══════════════════
 function setProgTabFilter(val,btn){
@@ -1239,27 +1242,55 @@ function setProgTabFilter(val,btn){
   _renderProgRows(val);
 }
 
-// ═══════════════════ LD & IT TAB FILTERS ═══════════════════
-let LD_TAB_FILTER='all', IT_TAB_FILTER='all';
+// ═══════════════════ LD & IT CLICK-TO-EXPAND ═══════════════════
 let _ldSetup=[], _ldC1=[], _ldC2=[], _itItems={};
+let _LD_ACTIVE=null, _IT_ACTIVE=null;
 
-function setLDTabFilter(val,btn){
-  LD_TAB_FILTER=val;
-  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  const applyFilter=(arr)=>val==='all'?arr:arr.filter(i=>i[1]===val);
-  document.getElementById('ld-setup-list').innerHTML=applyFilter(_ldSetup).map(([l,s,o])=>tli(l,s,o)).join('');
-  document.getElementById('ld-c1-list').innerHTML=applyFilter(_ldC1).map(([l,s,o])=>tli(l,s,o)).join('');
-  document.getElementById('ld-c2-list').innerHTML=applyFilter(_ldC2).map(([l,s,o])=>tli(l,s,o)).join('');
-}
-function setITTabFilter(val,btn){
-  IT_TAB_FILTER=val;
-  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  const applyFilter=(arr)=>val==='all'?arr:arr.filter(i=>i[1]===val);
-  Object.entries(_itItems).forEach(([id,arr])=>{
-    document.getElementById(id).innerHTML=applyFilter(arr).map(([l,s,o])=>tli(l,s,o)).join('');
+function filterLDByStatus(status, el){
+  const det=document.getElementById('ld-detail');
+  document.querySelectorAll('#ld-stats .sp').forEach(s=>s.classList.remove('sp-active'));
+  if(_LD_ACTIVE===status){ det.style.display='none'; _LD_ACTIVE=null; return; }
+  _LD_ACTIVE=status;
+  el.classList.add('sp-active');
+  const cats=[
+    {cat:'Program Setup', items:_ldSetup},
+    {cat:'Cohort 1',      items:_ldC1},
+    {cat:'Cohort 2',      items:_ldC2},
+  ];
+  let html='';
+  cats.forEach(({cat,items})=>{
+    const filtered=items.filter(([l,s])=>s===status);
+    if(!filtered.length) return;
+    html+=`<div style="font-weight:600;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 3px;padding-bottom:3px;border-bottom:1px solid var(--border)">${cat}</div>`;
+    html+=`<ul class="tl">${filtered.map(([l,s,o])=>tli(l,s,o)).join('')}</ul>`;
   });
+  if(!html) html='<div style="color:var(--muted);font-size:13px;padding:8px 0">No items found.</div>';
+  det.innerHTML=html;
+  det.style.display='block';
+}
+
+const _IT_CAT_LABELS={
+  'it-sec-l':'Security & Access',
+  'it-ep-l':'Endpoint & Network',
+  'it-lap-l':'Laptop & VDI',
+  'it-sup-l':'Support & Day-0',
+};
+function filterITByStatus(status, el){
+  const det=document.getElementById('it-detail');
+  document.querySelectorAll('#it-stats .sp').forEach(s=>s.classList.remove('sp-active'));
+  if(_IT_ACTIVE===status){ det.style.display='none'; _IT_ACTIVE=null; return; }
+  _IT_ACTIVE=status;
+  el.classList.add('sp-active');
+  let html='';
+  Object.entries(_itItems).forEach(([id,items])=>{
+    const filtered=items.filter(([l,s])=>s===status);
+    if(!filtered.length) return;
+    html+=`<div style="font-weight:600;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 3px;padding-bottom:3px;border-bottom:1px solid var(--border)">${_IT_CAT_LABELS[id]||id}</div>`;
+    html+=`<ul class="tl">${filtered.map(([l,s,o])=>tli(l,s,o)).join('')}</ul>`;
+  });
+  if(!html) html='<div style="color:var(--muted);font-size:13px;padding:8px 0">No items found.</div>';
+  det.innerHTML=html;
+  det.style.display='block';
 }
 
 // ═══════════════════ HR TAB FILTERS ═══════════════════
