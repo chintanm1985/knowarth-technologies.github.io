@@ -333,9 +333,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
         <div style="display:flex;align-items:center;margin-bottom:10px">
           <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Experience Pyramid</div>
-          <button class="pyr-expand-btn" id="pyr-exp-btn" onclick="togglePyrExp()">▸ Band Detail</button>
+          <button class="pyr-expand-btn" id="pyr-exp-btn" onclick="togglePyrExp()">▸ Show Experience Pyramid</button>
         </div>
-        <div class="pyramid-wrap" id="pyramid-wrap">
+        <div class="pyramid-wrap" id="pyramid-wrap" style="display:none">
           <div class="pyramid-svg-wrap"><svg id="pyr-svg" width="220" height="200" viewBox="0 0 220 200"></svg></div>
           <div class="pyramid-legend" id="pyr-legend"></div>
         </div>
@@ -452,8 +452,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="card-hdr" onclick="tog('prog')">
       <div class="card-title">
         <span class="kn" style="background:var(--navy)">5</span>
-        Program Progress
-        <span style="font-size:11px;font-weight:400;color:var(--muted)">&nbsp;· Cohort 1 scope</span>
+        Program Summary
+        <span style="font-size:11px;font-weight:400;color:var(--muted)">&nbsp;· Plan + Action Items</span>
       </div>
       <span class="chev">▼</span>
     </div>
@@ -484,15 +484,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div id="prog-spotlight" style="margin-bottom:10px"></div>
       <!-- Expand toggle -->
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
-        <button id="prog-expand-btn" onclick="toggleProgDetail()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:5px 14px;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:center">▸ Show Full Task Detail (${PROG_C1.length} tasks)</button>
+        <button id="prog-expand-btn" onclick="toggleProgDetail()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:5px 14px;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:center">▸ Show Full Detail</button>
         <div id="prog-detail" style="display:none;margin-top:10px">
-          <div class="kpi-sf" style="margin-bottom:8px">
-            <button class="on" style="border-color:var(--navy);color:var(--navy)" onclick="setProgTabFilter('all',this)">All</button>
-            <button onclick="setProgTabFilter('Done',this)">✅ Done</button>
-            <button onclick="setProgTabFilter('InProgress',this)">🔄 In Progress</button>
-            <button onclick="setProgTabFilter('Open',this)">⭕ Open</button>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center">
+            <div class="kpi-sf" style="margin:0">
+              <button class="on" style="border-color:var(--navy);color:var(--navy)" onclick="setProgTabFilter('all',this)">All</button>
+              <button onclick="setProgTabFilter('plan',this)">📋 Plan</button>
+              <button onclick="setProgTabFilter('action_items',this)">⚡ Actions</button>
+              <button onclick="setProgTabFilter('Done',this)">✅ Done</button>
+              <button onclick="setProgTabFilter('InProgress',this)">🔄 In Progress</button>
+              <button onclick="setProgTabFilter('Open',this)">⭕ Open</button>
+            </div>
           </div>
-          <table class="dt"><thead><tr><th>Activity</th><th>Owner</th><th>Area</th><th>Status</th><th>ETA</th></tr></thead>
+          <table class="dt"><thead><tr><th>Activity</th><th>Owner</th><th>Responsible / Area</th><th>Type</th><th>Status</th><th>ETA</th></tr></thead>
           <tbody id="prog-tbody"></tbody></table>
         </div>
       </div>
@@ -711,10 +715,13 @@ function renderPyramid(d){
 }
 
 function togglePyrExp(){
+  const wrap=document.getElementById('pyramid-wrap');
   const panel=document.getElementById('pyr-exp-panel');
   const btn=document.getElementById('pyr-exp-btn');
-  const on=panel.classList.toggle('on');
-  btn.textContent=on?'▾ Min. Exp. Detail':'▸ Min. Exp. Detail';
+  const nowOpen=wrap.style.display==='none'||wrap.style.display==='';
+  wrap.style.display=nowOpen?'flex':'none';
+  panel.style.display=nowOpen?'block':'none';
+  btn.textContent=nowOpen?'▾ Hide Experience Pyramid':'▸ Show Experience Pyramid';
 }
 
 // ═══════════════════ 2. L&D ═══════════════════
@@ -886,14 +893,20 @@ function renderDeptActionItems(filtered){
       if(!rows.length) return '';
       const itemsHtml=rows.map(r=>{
         const sColor=r.s==='Done'?'var(--green)':r.s==='InProgress'?'var(--amber)':'var(--muted)';
+        const sBg   =r.s==='Done'?'var(--greenlt)':r.s==='InProgress'?'var(--amberlt)':'#F1F5F9';
         const sIcon =r.s==='Done'?'✅':r.s==='InProgress'?'🔄':'⭕';
-        const etaStr=r.e?'<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);margin-left:6px">ETA '+r.e+'</span>':'';
-        return '<li style="list-style:none;padding:6px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:16px 1fr;gap:6px;align-items:start">'+
-          '<span style="color:'+sColor+';font-size:11px;margin-top:1px">'+sIcon+'</span>'+
-          '<div>'+
-            '<div style="font-size:12px;color:var(--text);font-weight:500">'+r.a+'</div>'+
-            '<div style="font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:8px">'+
-              (r.o?'<span>👤 '+r.o+'</span>':'')+'<span style="color:'+sColor+';font-weight:600">'+r.s+'</span>'+etaStr+
+        const etaStr=r.e?'<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);white-space:nowrap">📅 '+r.e+'</span>':'';
+        const areaStr=r.area?'<span style="font-size:10px;color:var(--teal);font-style:italic;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+r.area+'">📋 '+r.area+'</span>':'';
+        const respStr=r.o?'<span style="font-size:10.5px;color:var(--muted)">👤 '+r.o+'</span>':'';
+        const sBadgeEl='<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:'+sBg+';color:'+sColor+'">'+r.s+'</span>';
+        return '<li style="list-style:none;padding:7px 0;border-bottom:1px solid var(--border)">'+
+          '<div style="display:flex;align-items:flex-start;gap:6px">'+
+            '<span style="color:'+sColor+';font-size:11px;margin-top:2px;flex-shrink:0">'+sIcon+'</span>'+
+            '<div style="flex:1;min-width:0">'+
+              '<div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4">'+r.a+'</div>'+
+              '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:4px">'+
+                respStr+areaStr+sBadgeEl+etaStr+
+              '</div>'+
             '</div>'+
           '</div>'+
         '</li>';
@@ -943,6 +956,29 @@ function renderHR(){
   renderDeptActionItems(d);
 }
 
+// ─── Program detail row renderer (global so toggles can call it) ─────────────
+function _renderProgRows(filt){
+  const tbl=document.getElementById('prog-tbody');
+  if(!tbl) return;
+  const rows=filt==='all'?PROG_C1:
+    (filt==='plan'||filt==='action_items')?PROG_C1.filter(r=>r.src===filt):
+    PROG_C1.filter(r=>r.s===filt);
+  tbl.innerHTML=rows.map(r=>{
+    const typeBadge=r.src==='action_items'?
+      '<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:#EFF6FF;color:#1E40AF">⚡ Action</span>':
+      '<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:#F1F5F9;color:var(--muted)">📋 Plan</span>';
+    const respArea=(r.src==='action_items'&&r.area)?r.area:r.r;
+    return '<tr>'+
+      '<td>'+r.a+'</td>'+
+      '<td style="font-size:11px">'+r.o+'</td>'+
+      '<td style="font-size:10.5px;color:var(--muted)">'+respArea+'</td>'+
+      typeBadge+
+      '<td>'+sBadge(r.s)+'</td>'+
+      '<td style="font-family:\'DM Mono\',monospace;font-size:11px">'+(r.e&&!r.e.startsWith('=')?r.e:'—')+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
 // ═══════════════════ 5. PROGRAM ═══════════════════
 function renderProg(){
   const done=PROG_C1.filter(r=>r.s==='Done').length;
@@ -959,7 +995,7 @@ function renderProg(){
     <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--muted);font-size:19px">${open}</div><div class="l" style="color:var(--muted)">Open</div></div>`;
 
   const expBtn=document.getElementById('prog-expand-btn');
-  if(expBtn) expBtn.innerHTML='&#9657; Show Full Task Detail ('+total+' tasks)';
+  if(expBtn){const plan=PROG_C1.filter(r=>r.src==='plan').length,ai=PROG_C1.filter(r=>r.src==='action_items').length;expBtn.innerHTML='&#9657; Show Full Detail ('+plan+' plan + '+ai+' actions)';}
 
   // Workstream bars
   const WS=[
@@ -1012,13 +1048,9 @@ function renderProg(){
   } else { spotEl.innerHTML=''; }
 
   // Full task detail table (collapsed)
-  document.getElementById('prog-tbody').innerHTML=PROG_C1.map(r=>'<tr>'+
-    '<td>'+r.a+'</td>'+
-    '<td style="font-size:11px">'+r.o+'</td>'+
-    '<td style="font-size:11px;color:var(--muted)">'+r.r+'</td>'+
-    '<td>'+sBadge(r.s)+'</td>'+
-    '<td style="font-family:\'DM Mono\',monospace;font-size:11px">'+(r.e&&!r.e.startsWith('=')?r.e:'&mdash;')+'</td>'+
-  '</tr>').join('');
+  const _pgTbl=document.getElementById('prog-tbody');
+  if(_pgTbl) _pgTbl.setAttribute('data-filter','all');
+  _renderProgRows('all');
 
   setTimeout(()=>{const c=2*Math.PI*30;document.getElementById('darc').setAttribute('stroke-dasharray',(c*pct/100)+' '+(c*(1-pct/100)));},500);
 }
@@ -1026,12 +1058,15 @@ function renderProg(){
 function toggleProgDetail(){
   const det=document.getElementById('prog-detail');
   const btn=document.getElementById('prog-expand-btn');
+  const plan=PROG_C1.filter(r=>r.src==='plan').length;
+  const ai=PROG_C1.filter(r=>r.src==='action_items').length;
   if(det.style.display==='none'){
     det.style.display='block';
-    btn.innerHTML='&#9663; Hide Task Detail';
+    btn.innerHTML='&#9663; Hide Detail';
+    _renderProgRows('all');
   } else {
     det.style.display='none';
-    btn.innerHTML='&#9657; Show Full Task Detail ('+PROG_C1.length+' tasks)';
+    btn.innerHTML='&#9657; Show Full Detail ('+plan+' plan + '+ai+' actions)';
   }
 }
 
@@ -1112,14 +1147,9 @@ function swt(sec,tab,btn){
 function setProgTabFilter(val,btn){
   btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  let items=val==='all'?PROG_C1:PROG_C1.filter(r=>r.s===val);
-  document.getElementById('prog-tbody').innerHTML=items.map(r=>`<tr>
-    <td>${r.a}</td>
-    <td style="font-size:11px">${r.o}</td>
-    <td style="font-size:11px;color:var(--muted)">${r.r}</td>
-    <td>${sBadge(r.s)}</td>
-    <td style="font-family:'DM Mono',monospace;font-size:11px">${r.e&&!r.e.startsWith('=')?r.e:'—'}</td>
-  </tr>`).join('');
+  const tbl=document.getElementById('prog-tbody');
+  tbl.setAttribute('data-filter',val);
+  _renderProgRows(val);
 }
 
 // ═══════════════════ LD & IT TAB FILTERS ═══════════════════
