@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acxiom Resource Center – Program Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B3E;--teal:#0A7E8C;--teallt:#E0F5F7;--mint:#C5EFF5;
+  --bg:#EEF2F8;--surface:#FFF;--border:#DDE5EE;--text:#1A2438;--muted:#6B7A99;
+  --green:#16A34A;--greenlt:#DCFCE7;--amber:#D97706;--amberlt:#FEF3C7;
+  --red:#DC2626;--redlt:#FEE2E2;--indigo:#4338CA;--indigolt:#EEF2FF;
+  --purple:#7C3AED;--purplt:#F5F3FF;--slate:#8B98B4;--slatelt:#F1F5F9;--r:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+.hdr{background:var(--navy);padding:10px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.28)}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.logo-acx{height:28px;width:auto;filter:brightness(0) invert(1);opacity:.9}
+.logo-anb{height:32px;width:auto}
+.logo-div{width:1px;height:32px;background:rgba(255,255,255,.2)}
+.hdr-title{font-size:14px;font-weight:600;color:#fff}
+.hdr-sub{font-size:10px;color:var(--mint);opacity:.75;margin-top:1px}
+.dt-badge{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 11px;font-size:11px;color:var(--mint);font-family:'DM Mono',monospace}
+
+/* MAIN */
+.main{padding:16px 26px 48px}
+
+/* KPI DRILL PANEL */
+.kpi-drill{display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px;margin-bottom:14px;position:relative}
+.kpi-drill.on{display:block}
+.kpi-drill-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.kpi-drill-close{cursor:pointer;color:var(--muted);font-size:14px;width:22px;height:22px;display:grid;place-items:center;border-radius:4px;transition:background .13s}
+.kpi-drill-close:hover{background:#EEF2F7}
+.kpi-sf{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.kpi-sf button{padding:3px 10px;border-radius:14px;border:1.5px solid var(--border);background:#fff;font-size:10.5px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .13s;font-family:'DM Sans',sans-serif}
+.kpi-sf button:hover{border-color:var(--teal);color:var(--teal)}
+.kpi-sf button.on{font-weight:600}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.ks{background:var(--surface);border-radius:10px;padding:12px 15px;border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
+.ks:hover{box-shadow:0 0 0 2px var(--teal)}
+.ks-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+.ks-lbl{font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.ks-big{font-size:22px;font-weight:700;line-height:1;margin-bottom:5px}
+.ks-chips{display:flex;flex-wrap:wrap;gap:3px}
+
+/* FILTER BAR */
+.fbar{display:flex;align-items:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.fbar-lbl{font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.fbtn{padding:4px 13px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.fbtn:hover{border-color:var(--teal);color:var(--teal)}
+.fbtn.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.grid .s2{grid-column:1/-1}
+
+/* CARD */
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden}
+.card-hdr{padding:12px 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .13s}
+.card-hdr:hover{background:#f8fafc}
+.card-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text)}
+.kn{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:10.5px;font-weight:700;color:#fff;flex-shrink:0}
+.chev{color:var(--muted);transition:transform .22s;font-size:12px}
+.coll .chev{transform:rotate(-90deg)}
+.cbody{padding:13px 17px}
+
+/* STAT PILLS */
+.srow{display:flex;gap:8px;margin-bottom:11px;flex-wrap:wrap}
+.sp{flex:1;min-width:65px;border-radius:9px;padding:8px 10px;text-align:center}
+.sp .n{font-size:24px;font-weight:700;line-height:1}
+.sp .l{font-size:9.5px;margin-top:2px;opacity:.8}
+
+/* TABS */
+.tbar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:12px}
+.tbtn{padding:6px 14px;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .13s;white-space:nowrap;font-family:'DM Sans',sans-serif;background:none;border-top:none;border-left:none;border-right:none}
+.tbtn:hover{color:var(--text)}
+.tbtn.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
+.tpanel{display:none}.tpanel.on{display:block}
+
+/* TABLES */
+.dt{width:100%;border-collapse:collapse;font-size:12px}
+.dt th{background:#F5F8FB;color:var(--muted);font-weight:600;text-align:left;padding:6px 9px;font-size:10.5px;letter-spacing:.35px;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+.dt td{padding:6px 9px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+.dt tr:last-child td{border-bottom:none}
+.dt tr:hover td{background:#FAFBFD}
+
+/* COHORT TABLE */
+.ct{width:100%;border-collapse:collapse;font-size:12px}
+.ct th{background:var(--navy);color:rgba(255,255,255,.8);font-size:10px;font-weight:500;padding:7px 11px;text-align:center;letter-spacing:.5px;text-transform:uppercase}
+.ct th:first-child{text-align:left}
+.ct td{padding:7px 11px;text-align:center;border-bottom:1px solid #EEF2F7}
+.ct td:first-child{text-align:left;font-weight:500}
+.ct tr:hover td{background:#FAFBFD;cursor:pointer}
+.ct .tr-tot td{font-weight:700;background:#F0F4F8;border-top:2px solid var(--border)}
+
+/* BADGES */
+.b{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:600;white-space:nowrap}
+.b::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.bg{background:var(--greenlt);color:var(--green)}.ba{background:var(--amberlt);color:var(--amber)}
+.br{background:var(--redlt);color:var(--red)}.bi{background:var(--indigolt);color:var(--indigo)}
+.bs{background:var(--slatelt);color:var(--slate)}.bp{background:var(--purplt);color:var(--purple)}
+
+/* PROGRESS */
+.pw{height:5px;background:#E9EEF5;border-radius:3px;overflow:hidden}
+.pf{height:100%;border-radius:3px;transition:width .65s}
+.pi{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.pl{font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbw{width:100px;flex-shrink:0}
+.pc{font-size:11px;color:var(--muted);width:38px;text-align:right;flex-shrink:0;font-family:'DM Mono',monospace}
+
+/* BGV DRILL */
+.bgv-sub{display:none;background:#F8FAFB}
+.bgv-sub.on{display:table-row}
+.bgv-sub td{padding:7px 14px 7px 24px!important;font-size:11px}
+.xbtn{cursor:pointer;color:var(--teal);font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(10,126,140,.07);transition:background .13s;user-select:none}
+.xbtn:hover{background:rgba(10,126,140,.15)}
+
+/* BGV SUMMARY BOXES */
+.bgv-sum{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.bgv-box{border-radius:9px;padding:12px 14px;border:1px solid var(--border);background:#FAFCFF}
+.bgv-box-title{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.bgv-stage-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.bgv-stat-row{display:flex;gap:6px;margin-bottom:10px}
+.bgv-stat{flex:1;text-align:center;border-radius:7px;padding:7px 3px}
+.bgv-stat .sv{font-size:19px;font-weight:700;line-height:1}
+.bgv-stat .sl{font-size:9px;margin-top:2px}
+
+/* STACKED BAR */
+.sbar{height:9px;display:flex;border-radius:5px;overflow:hidden;gap:1px;margin-bottom:4px}
+.sseg{height:100%}
+.sleg{display:flex;gap:13px;flex-wrap:wrap;margin-bottom:12px}
+.sleg-i{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--muted)}
+.sdot{width:7px;height:7px;border-radius:2px}
+
+/* TASK LIST */
+.tl{list-style:none}
+.tli{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 6px;border-radius:5px;transition:background .1s}
+.tli:hover{background:#F5F8FB}
+.tdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* DONUT */
+.dring{position:relative;width:76px;height:76px;flex-shrink:0}
+.dring svg{transform:rotate(-90deg)}
+.dcen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dpct{font-size:18px;font-weight:700;color:var(--navy);line-height:1}
+.dlbl{font-size:8.5px;color:var(--muted)}
+
+/* ALERT */
+.alert{background:var(--amberlt);border:1px solid #FCD34D;border-radius:7px;padding:8px 12px;font-size:11.5px;color:#92400E;display:flex;gap:7px;align-items:flex-start;margin-top:9px}
+
+/* TWO COL */
+.tcol{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* PYRAMID */
+.pyramid-wrap{display:flex;gap:24px;align-items:flex-start;margin-bottom:14px}
+.pyramid-svg-wrap{flex-shrink:0}
+.pyr-expand-btn{font-size:10px;cursor:pointer;padding:2px 8px;border-radius:4px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-family:'DM Sans',sans-serif;margin-left:8px;transition:all .13s}
+.pyr-expand-btn:hover{border-color:var(--teal);color:var(--teal)}
+.pyr-exp-panel{display:none;margin-top:10px}
+.pyr-exp-panel.on{display:block}
+.pyr-exp-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.pyr-exp-table th{background:#F5F8FB;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding:5px 9px;border-bottom:1px solid var(--border)}
+.pyr-exp-table td{padding:5px 9px;border-bottom:1px solid #EEF2F7}
+.pyr-exp-table tr:last-child td{border-bottom:none}
+.pyramid-legend{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.pyr-leg-row{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.pyr-leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.pyr-leg-lbl{flex:1;color:var(--text)}
+.pyr-leg-cnt{font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;font-size:12px}
+.pyr-leg-pct{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* DEPT ACTION ITEMS */
+.dept-act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.dept-act-card{border-radius:9px;border:1px solid var(--border);background:#FAFCFF;padding:10px 13px}
+.dept-act-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+
+/* ONBOARDING SECTION */
+.onb-section{margin-bottom:14px}
+.onb-phase-hdr{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:5px 8px;border-radius:6px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+
+@media(max-width:900px){.grid{grid-template-columns:1fr}.grid .s2{grid-column:1}.kpi-strip{grid-template-columns:repeat(2,1fr)}.bgv-sum{grid-template-columns:1fr}.tcol{grid-template-columns:1fr}.dept-act-grid{grid-template-columns:1fr}.pyramid-wrap{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-left">
+    <svg viewBox="0 0 230 52" xmlns="http://www.w3.org/2000/svg" style="height:42px;width:auto;display:block;flex-shrink:0">
+  <!-- "a" mark — all white -->
+  <!-- Outer ring body -->
+  <circle cx="26" cy="26" r="22" fill="none" stroke="#ffffff" stroke-width="7"/>
+  <!-- Inner cutout arc creating open letterform -->
+  <path d="M 15 34 C 14 40 19 47 26 47 C 33 47 40 41 41 34" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+  <!-- Stem bar of 'a' -->
+  <line x1="40" y1="15" x2="40" y2="38" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+  <!-- Floating accent dot -->
+  <circle cx="47" cy="6" r="4" fill="#ffffff"/>
+  <!-- "anblicks" wordmark — white -->
+  <text x="60" y="31" font-family="'Segoe UI','DM Sans','Helvetica Neue',Arial,sans-serif"
+        font-size="21" font-weight="400" fill="#ffffff" letter-spacing="0.4">anblicks</text>
+  <!-- Red accent dot over 'i' replaced with white dot -->
+  <circle cx="119" cy="13" r="3.2" fill="rgba(255,255,255,0.9)"/>
+  <!-- Tagline -->
+  <text x="60" y="46" font-family="'Segoe UI','DM Sans','Helvetica Neue',Arial,sans-serif"
+        font-size="7.5" font-weight="700" fill="rgba(255,255,255,0.65)" letter-spacing="1.6">UNLEASH YOUR DATA</text>
+</svg>
+    <div class="logo-div"></div>
+    <img class="logo-acx" src="data:image/png;base64,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" alt="Acxiom">
+    <div class="logo-div"></div>
+    <div>
+      <div class="hdr-title">Acxiom Resource Center &ndash; Program Dashboard</div>
+      <div class="hdr-sub">Hiring · L&D · IT &amp; Infra · HR/BGV · Program Progress</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="dt-badge" id="dt-badge">Mar 17, 2026</span>
+    <span id="sp-status-chip" style="font-size:10.5px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.55);font-family:'DM Mono',monospace">⚡ Not connected</span>
+    <button id="sp-connect-btn" onclick="spConnect()" style="font-size:11px;font-weight:600;padding:5px 13px;border-radius:6px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔗 Connect</button>
+    <button onclick="spConfigOpen()" title="SharePoint Settings" style="font-size:14px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.45);padding:3px 6px;border-radius:5px" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'">⚙</button>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- TOP KPI STRIP -->
+<div class="kpi-strip" id="kpi-strip"></div>
+<!-- KPI DRILL PANELS -->
+<div class="kpi-drill" id="drill-hiring">
+  <div class="kpi-drill-title">
+    <span id="drill-hiring-title">Hiring – Detail</span>
+    <span class="kpi-drill-close" onclick="closeDrill('hiring')">✕</span>
+  </div>
+  <div class="kpi-sf" id="drill-hiring-sf">
+    <button class="on" style="border-color:var(--green);color:var(--green)" onclick="setDrillFilter('hiring','all',this)">All</button>
+    <button onclick="setDrillFilter('hiring','3.Onboarded',this)" style="">✅ Onboarded</button>
+    <button onclick="setDrillFilter('hiring','2.Offer Accepted',this)">📋 Offer Accepted</button>
+    <button onclick="setDrillFilter('hiring','1.WIP',this)">🔄 WIP</button>
+  </div>
+  <div id="drill-hiring-body"></div>
+</div>
+<div class="kpi-drill" id="drill-ld">
+  <div class="kpi-drill-title">
+    <span>L&amp;D / Training – Detail</span>
+    <span class="kpi-drill-close" onclick="closeDrill('ld')">✕</span>
+  </div>
+  <div class="kpi-sf" id="drill-ld-sf">
+    <button class="on" style="border-color:var(--purple);color:var(--purple)" onclick="setLDFilter('all',this)">All</button>
+    <button onclick="setLDFilter('Done',this)">✅ Done</button>
+    <button onclick="setLDFilter('InProgress',this)">🔄 In Progress</button>
+    <button onclick="setLDFilter('Open',this)">⭕ Open</button>
+  </div>
+  <div id="drill-ld-body"></div>
+</div>
+<div class="kpi-drill" id="drill-it">
+  <div class="kpi-drill-title">
+    <span>IT &amp; Infrastructure – Detail</span>
+    <span class="kpi-drill-close" onclick="closeDrill('it')">✕</span>
+  </div>
+  <div class="kpi-sf" id="drill-it-sf">
+    <button class="on" style="border-color:var(--teal);color:var(--teal)" onclick="setITFilter('all',this)">All</button>
+    <button onclick="setITFilter('Done',this)">✅ Done</button>
+    <button onclick="setITFilter('InProgress',this)">🔄 In Progress</button>
+    <button onclick="setITFilter('Open',this)">⭕ Open</button>
+  </div>
+  <div id="drill-it-body"></div>
+</div>
+<div class="kpi-drill" id="drill-bgv">
+  <div class="kpi-drill-title">
+    <span>BGV / Onboarding – Detail</span>
+    <span class="kpi-drill-close" onclick="closeDrill('bgv')">✕</span>
+  </div>
+  <div class="kpi-sf" id="drill-bgv-sf">
+    <button class="on" style="border-color:#B45309;color:#B45309" onclick="setDrillFilter('bgv','all',this)">All</button>
+    <button onclick="setDrillFilter('bgv','3.Onboarded',this)">✅ Onboarded</button>
+    <button onclick="setDrillFilter('bgv','2.Offer Accepted',this)">📋 Offer Accepted</button>
+    <button onclick="setDrillFilter('bgv','1.WIP',this)">🔄 WIP</button>
+  </div>
+  <div id="drill-bgv-body"></div>
+</div>
+<div class="kpi-drill" id="drill-prog">
+  <div class="kpi-drill-title">
+    <span>Program Progress – Detail</span>
+    <span class="kpi-drill-close" onclick="closeDrill('prog')">✕</span>
+  </div>
+  <div class="kpi-sf" id="drill-prog-sf">
+    <button class="on" style="border-color:var(--navy);color:var(--navy)" onclick="setProgFilter('all',this)">All</button>
+    <button onclick="setProgFilter('Done',this)">✅ Done</button>
+    <button onclick="setProgFilter('InProgress',this)">🔄 In Progress</button>
+    <button onclick="setProgFilter('Open',this)">⭕ Open</button>
+  </div>
+  <div id="drill-prog-body"></div>
+</div>
+
+<!-- COHORT FILTER -->
+<div class="fbar">
+  <span class="fbar-lbl">Cohort:</span>
+  <button class="fbtn on" onclick="setF('all',this)">All</button>
+  <button class="fbtn" onclick="setF(1,this)">Cohort 1 – Mar</button>
+  <button class="fbtn" onclick="setF(2,this)">Cohort 2 – Apr</button>
+  <button class="fbtn" onclick="setF(3,this)">Cohort 3 – May</button>
+  <button class="fbtn" onclick="setF(4,this)">Cohort 4 – Jun</button>
+</div>
+<div class="fbar" id="hm-fbar">
+  <span class="fbar-lbl">Hiring Manager:</span>
+  <button class="fbtn on" id="hmf-all" onclick="setHMF('all',this)">All</button>
+</div>
+
+<div class="grid">
+
+  <!-- 1. HIRING -->
+  <div class="card s2" id="c-hiring">
+    <div class="card-hdr" onclick="tog('hiring')">
+      <div class="card-title">
+        <span class="kn" style="background:var(--teal)">1</span>
+        Hiring – Cohort Progress
+        <span id="h-flbl" style="font-size:11px;font-weight:400;color:var(--muted)"></span>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b-hiring">
+      <div class="srow" id="h-stats"></div>
+      <div class="sbar" id="h-sbar"></div>
+      <div class="sleg" id="h-sleg"></div>
+      <table class="ct"><thead><tr><th>Cohort</th><th>Onboarded</th><th>Offer Accepted</th><th>WIP</th><th>Total</th><th>Progress</th></tr></thead>
+      <tbody id="h-tbody"></tbody></table>
+      <!-- Grade Pyramid -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;margin-bottom:10px">
+          <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Experience (Min. Exp.)</div>
+          <button class="pyr-expand-btn" id="pyr-exp-btn" onclick="togglePyrExp()">▸ Min. Exp. Detail</button>
+        </div>
+        <div class="pyramid-wrap" id="pyramid-wrap">
+          <div class="pyramid-svg-wrap"><svg id="pyr-svg" width="220" height="200" viewBox="0 0 220 200"></svg></div>
+          <div class="pyramid-legend" id="pyr-legend"></div>
+        </div>
+        <div class="pyr-exp-panel" id="pyr-exp-panel">
+          <table class="pyr-exp-table">
+            <thead><tr><th>Experience Band</th><th>Count</th><th>Min. Exp.</th><th>Typical Roles</th></tr></thead>
+            <tbody id="pyr-exp-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. L&D -->
+  <div class="card" id="c-ld">
+    <div class="card-hdr" onclick="tog('ld')">
+      <div class="card-title"><span class="kn" style="background:var(--purple)">2</span>L&amp;D / Training</div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b-ld">
+      <div class="srow" id="ld-stats"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:2px">
+        <div class="tbar" style="margin-bottom:0;border-bottom:none">
+          <button class="tbtn on" onclick="swt('ld','setup',this)">Program Setup</button>
+          <button class="tbtn" onclick="swt('ld','c1',this)">Cohort 1</button>
+          <button class="tbtn" onclick="swt('ld','c2',this)">Cohort 2</button>
+        </div>
+        <div class="kpi-sf" id="ld-status-sf" style="margin-bottom:0">
+          <button class="on" style="border-color:var(--purple);color:var(--purple)" onclick="setLDTabFilter('all',this)">All</button>
+          <button onclick="setLDTabFilter('Done',this)">✅ Done</button>
+          <button onclick="setLDTabFilter('InProgress',this)">🔄 In Progress</button>
+          <button onclick="setLDTabFilter('Open',this)">⭕ Open</button>
+        </div>
+      </div>
+      <div style="border-bottom:2px solid var(--border);margin-bottom:12px"></div>
+      <div id="ld-setup" class="tpanel on"><ul class="tl" id="ld-setup-list"></ul></div>
+      <div id="ld-c1"    class="tpanel"><ul class="tl" id="ld-c1-list"></ul></div>
+      <div id="ld-c2"    class="tpanel"><ul class="tl" id="ld-c2-list"></ul></div>
+    </div>
+  </div>
+
+  <!-- 3. IT & INFRA -->
+  <div class="card" id="c-it">
+    <div class="card-hdr" onclick="tog('it')">
+      <div class="card-title"><span class="kn" style="background:var(--teal)">3</span>IT &amp; Infrastructure</div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b-it">
+      <div class="srow" id="it-stats"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:2px">
+        <div class="tbar" style="margin-bottom:0;border-bottom:none">
+          <button class="tbtn on" onclick="swt('it','sec',this)">Security &amp; Access</button>
+          <button class="tbtn" onclick="swt('it','ep',this)">Endpoint &amp; Network</button>
+          <button class="tbtn" onclick="swt('it','lap',this)">Laptop &amp; VDI</button>
+          <button class="tbtn" onclick="swt('it','sup',this)">Support &amp; Day-0</button>
+        </div>
+        <div class="kpi-sf" id="it-status-sf" style="margin-bottom:0">
+          <button class="on" style="border-color:var(--teal);color:var(--teal)" onclick="setITTabFilter('all',this)">All</button>
+          <button onclick="setITTabFilter('Done',this)">✅ Done</button>
+          <button onclick="setITTabFilter('InProgress',this)">🔄 In Progress</button>
+          <button onclick="setITTabFilter('Open',this)">⭕ Open</button>
+        </div>
+      </div>
+      <div style="border-bottom:2px solid var(--border);margin-bottom:12px"></div>
+      <div id="it-sec" class="tpanel on"><ul class="tl" id="it-sec-l"></ul></div>
+      <div id="it-ep"  class="tpanel"><ul class="tl" id="it-ep-l"></ul></div>
+      <div id="it-lap" class="tpanel"><ul class="tl" id="it-lap-l"></ul></div>
+      <div id="it-sup" class="tpanel"><ul class="tl" id="it-sup-l"></ul></div>
+    </div>
+  </div>
+
+  <!-- 4. HR & BGV / ONBOARDING -->
+  <div class="card s2" id="c-hr">
+    <div class="card-hdr" onclick="tog('hr')">
+      <div class="card-title"><span class="kn" style="background:#B45309">4</span>HR &amp; Onboarding | BGV Completion</div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b-hr">
+      <div class="bgv-sum" id="bgv-sum"></div>
+      <div class="tbar">
+        <button class="tbtn on" onclick="swt('hr','p1',this)">✅ Onboarded</button>
+        <button class="tbtn" onclick="swt('hr','p2',this)">📋 Offer Accepted</button>
+        <button class="tbtn" onclick="swt('hr','p3',this)">🔄 WIP</button>
+        <button class="tbtn" onclick="swt('hr','act',this)">HR Activities</button>
+        <button class="tbtn" onclick="swt('hr','dept',this)">HR / IT / L&D / Program</button>
+      </div>
+      <div id="hr-p1" class="tpanel on">
+        <div class="onb-phase-hdr" style="background:var(--greenlt);color:var(--green)">✅ Onboarded Resources</div>
+        <table class="dt"><thead><tr><th>Resource</th><th>Role</th><th>Acxiom Hiring Manager</th><th>BGV Stg 1</th><th>BGV Stg 2</th></tr></thead>
+        <tbody id="bgv-p1"></tbody></table>
+      </div>
+      <div id="hr-p2" class="tpanel">
+        <div class="onb-phase-hdr" style="background:var(--amberlt);color:var(--amber)">📋 Offer Accepted — Joining Soon</div>
+        <table class="dt"><thead><tr><th>Resource</th><th>Role</th><th>Acxiom Hiring Manager</th><th>BGV Stg 1</th><th>BGV Stg 2</th></tr></thead>
+        <tbody id="bgv-p2"></tbody></table>
+      </div>
+      <div id="hr-p3" class="tpanel">
+        <div class="onb-phase-hdr" style="background:var(--indigolt);color:var(--indigo)">🔄 WIP — In Process</div>
+        <table class="dt"><thead><tr><th>Client Req ID</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Expected Join</th><th>BGV Stg 1</th><th>BGV Stg 2</th></tr></thead>
+        <tbody id="bgv-p3"></tbody></table>
+      </div>
+      <div id="hr-act" class="tpanel">
+        <ul class="tl" id="hr-act-list"></ul>
+      </div>
+      <div id="hr-dept" class="tpanel">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Action items grouped into HR, IT, L&D and Program</div>
+        <div class="dept-act-grid" id="dept-act-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. PROGRAM PROGRESS -->
+  <div class="card s2" id="c-prog">
+    <div class="card-hdr" onclick="tog('prog')">
+      <div class="card-title">
+        <span class="kn" style="background:var(--navy)">5</span>
+        Program Progress
+        <span style="font-size:11px;font-weight:400;color:var(--muted)">&nbsp;· Cohort 1 scope</span>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b-prog">
+      <!-- Executive Summary Row -->
+      <div style="display:flex;align-items:center;gap:20px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:13px">
+          <div class="dring">
+            <svg width="76" height="76" viewBox="0 0 76 76">
+              <circle cx="38" cy="38" r="30" fill="none" stroke="#EEF2F5" stroke-width="8"/>
+              <circle id="darc" cx="38" cy="38" r="30" fill="none" stroke="var(--teal)" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="0 189" style="transition:stroke-dasharray .8s"/>
+            </svg>
+            <div class="dcen"><div class="dpct" id="dpct">–</div><div class="dlbl">Complete</div></div>
+          </div>
+          <div>
+            <div style="font-size:19px;font-weight:700;color:var(--navy)" id="prog-frac"></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">tasks completed</div>
+          </div>
+        </div>
+        <div class="srow" style="margin:0" id="prog-pills"></div>
+      </div>
+      <!-- Workstream Bars -->
+      <div id="prog-bars" style="margin-bottom:14px"></div>
+      <!-- Key Alerts -->
+      <div id="prog-alerts" style="margin-bottom:14px"></div>
+      <!-- In-Progress Spotlight -->
+      <div id="prog-spotlight" style="margin-bottom:10px"></div>
+      <!-- Expand toggle -->
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+        <button id="prog-expand-btn" onclick="toggleProgDetail()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:5px 14px;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:center">▸ Show Full Task Detail (${PROG_C1.length} tasks)</button>
+        <div id="prog-detail" style="display:none;margin-top:10px">
+          <div class="kpi-sf" style="margin-bottom:8px">
+            <button class="on" style="border-color:var(--navy);color:var(--navy)" onclick="setProgTabFilter('all',this)">All</button>
+            <button onclick="setProgTabFilter('Done',this)">✅ Done</button>
+            <button onclick="setProgTabFilter('InProgress',this)">🔄 In Progress</button>
+            <button onclick="setProgTabFilter('Open',this)">⭕ Open</button>
+          </div>
+          <table class="dt"><thead><tr><th>Activity</th><th>Owner</th><th>Area</th><th>Status</th><th>ETA</th></tr></thead>
+          <tbody id="prog-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+</main>
+
+<!-- MODAL -->
+<div id="mover" style="display:none;position:fixed;inset:0;background:rgba(13,27,62,.45);z-index:200;backdrop-filter:blur(2px)" onclick="closeMod()"></div>
+<div id="modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(96vw,920px);max-height:82vh;background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.22);z-index:201;overflow:hidden;flex-direction:column">
+  <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--navy)">
+    <div id="mtitle" style="font-size:14px;font-weight:600;color:#fff"></div>
+    <button onclick="closeMod()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:26px;height:26px;border-radius:5px;cursor:pointer;font-size:17px;display:grid;place-items:center">×</button>
+  </div>
+  <div style="overflow-y:auto;padding:16px 20px;flex:1" id="mbody"></div>
+</div>
+
+<!-- CDN libs loaded here so page HTML renders first before script download blocks -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
+<script>
+// ═══════════════════ DATA ═══════════════════
+
+const H=[{"sno": 1, "req": "REQ0912", "role": "QA Engineer(Senior)", "coe": "Apps", "hm": "Devlina Banerjee", "res": "Sudha Pattigudi", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "Completed", "it": "Laptop Handedover to user", "grade": "L5", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXQA002"}, {"sno": 2, "req": "REQ0913", "role": "QA Engineer", "coe": "Apps", "hm": "Devlina Banerjee", "res": "Sirisha Boppana", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "Completed", "it": "Mail send to user to collect laptop", "grade": "L4", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXQA003"}, {"sno": 3, "req": "REQ0931", "role": "QA Engineer(Senior)", "coe": "Apps", "hm": "Devlina Banerjee", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "1.WIP", "grade": "L7", "minexp": "8", "ej": "2026-04-15", "client_req": ""}, {"sno": 4, "req": "REQ0928", "role": "QA Engineer", "coe": "Apps", "hm": "Devlina Banerjee", "res": "Sai Kiran Kambham", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L3", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXQA004"}, {"sno": 5, "req": "REQ0932", "role": "QA Engineer(Senior)", "coe": "Apps", "hm": "Devlina Banerjee", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "1.WIP", "grade": "", "minexp": "5", "ej": "2026-05-15", "client_req": ""}, {"sno": 6, "req": "REQ0955", "role": "Software Engineering Manager", "coe": "Apps", "hm": "William McCoy", "res": "Sumit Kumar", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "Completed", "it": "", "grade": "L6", "minexp": "10", "ej": "2026-03-16", "client_req": "ACXSE001"}, {"sno": 7, "req": "REQ0929", "role": "QA Engineer", "coe": "Apps", "hm": "Devlina Banerjee", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 8, "req": "REQ0930", "role": "QA Engineer", "coe": "Apps", "hm": "Devlina Banerjee", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 9, "req": "REQ0933", "role": "QA Engineer(Senior)", "coe": "Apps", "hm": "Devlina Banerjee", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-05-15", "client_req": ""}, {"sno": 10, "req": "REQ0934", "role": "QA Engineer", "coe": "Apps", "hm": "Devlina Banerjee", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 11, "req": "REQ0948", "role": "Software Engineer", "coe": "Data Analytics", "hm": "William McCoy", "res": "Kishore Kumar Telu", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "Completed", "it": "Mail send to user to collect laptop", "grade": "L6", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXSE008"}, {"sno": 12, "req": "REQ0984", "role": "Software Engineering Manager", "coe": "Apps", "hm": "William McCoy", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "10", "ej": "2026-04-15", "client_req": ""}, {"sno": 13, "req": "REQ0985", "role": "Software Engineering Manager", "coe": "Apps", "hm": "William McCoy", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "10", "ej": "2026-05-15", "client_req": ""}, {"sno": 14, "req": "REQ0973", "role": "Data Engineer", "coe": "Data Analytics", "hm": "James Mooney", "res": "Sai Surya Hanumanthu", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "", "grade": "L1", "minexp": "5", "ej": "2026-04-15", "client_req": ""}, {"sno": 15, "req": "REQ0999", "role": "Data Engineer", "coe": "Data Analytics", "hm": "James Mooney", "res": "Thanusha Veeramreddy", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "", "grade": "", "minexp": "5", "ej": "2026-04-15", "client_req": ""}, {"sno": 16, "req": "REQ0945", "role": "Data Engineer", "coe": "Data Analytics", "hm": "LaKetra Wright", "res": "Sohail Syed", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "Completed", "b2": "Completed", "it": "", "grade": "L4", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 17, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "Narendra Jonna", "doj": "2026-02-18", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 18, "req": "REQ0991", "role": "Devops Engineer", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "Pavan Kalyan Muniganti", "doj": "2026-03-02", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L3", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXDO002"}, {"sno": 19, "req": "REQ0927", "role": "Data Analyst", "coe": "Data Analytics", "hm": "Josh Freeman", "res": "MANEESHA KOLLA", "doj": "2026-03-05", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L4", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXDA001"}, {"sno": 20, "req": "REQ0935", "role": "Software Engineer", "coe": "Apps", "hm": "Amy Pecanty", "res": "Hari Ramakrishna Chanamolu", "doj": "2026-03-09", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L3", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXSE003"}, {"sno": 21, "req": "REQ0958", "role": "Software Engineers (Software Engineer - Java)", "coe": "Apps", "hm": "Josh Freeman", "res": "Mahendar Reddy Gaggenappalli", "doj": "2026-04-02", "fs": "2.Offer Accepted", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 22, "req": "REQ0986", "role": "Software Engineers (Software Engineer - Java)", "coe": "Apps", "hm": "Josh Freeman", "res": "Sai Kumar Udu", "doj": "2026-03-23", "fs": "2.Offer Accepted", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 23, "req": "REQ0987", "role": "Software Engineers (Software Engineer - Java)", "coe": "Apps", "hm": "Josh Freeman", "res": "Manasa CH", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 24, "req": "REQ0988", "role": "Full Stack Software Engineer – Tech Lead", "coe": "Apps", "hm": "Josh Freeman", "res": "Suresh C", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 25, "req": "REQ0921", "role": "Sr. Data Engineer", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "Pavan Kumar Neeli", "doj": "2026-03-09", "fs": "3.Onboarded", "b1": "Completed", "b2": "Completed", "it": "Laptop Handedover to user", "grade": "L3", "minexp": "5", "ej": "2026-03-16", "client_req": "ACXDE001"}, {"sno": 26, "req": "REQ0960", "role": "Software Engineers (Senior Full Stack)", "coe": "Apps", "hm": "Josh Freeman", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "2026-03-12", "grade": "", "minexp": "5", "ej": "2026-04-15", "client_req": ""}, {"sno": 27, "req": "REQ0961", "role": "Software Engineer", "coe": "Apps", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 28, "req": "REQ0989", "role": "Software Engineer", "coe": "Apps", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 29, "req": "REQ0962", "role": "Software Engineer", "coe": "Apps", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 30, "req": "REQ0990", "role": "Software Engineer", "coe": "Apps", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 31, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 32, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 33, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 34, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 35, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 36, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 37, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 38, "req": "REQ0925", "role": "Project Manager", "coe": "PMO", "hm": "Angie Graves", "res": "Kallol Rakshit", "doj": "2026-03-09", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "Mail send to user to collect laptop", "grade": "L7", "minexp": "10", "ej": "2026-03-16", "client_req": "ACXPM001"}, {"sno": 39, "req": "", "role": "Devops Engineer", "coe": "Cloudops", "hm": "Stan Sisson", "res": "Akhila Madduri", "doj": "2026-04-05", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "", "grade": "L3", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 40, "req": "", "role": "Devops Engineer", "coe": "Cloudops", "hm": "Stan Sisson", "res": "Karthick Raja P", "doj": "2026-03-23", "fs": "2.Offer Accepted", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 41, "req": "", "role": "Devops Engineer", "coe": "Cloudops", "hm": "Stan Sisson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 42, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Stan Sisson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 43, "req": "", "role": "Software Engineer", "coe": "Apps", "hm": "Stan Sisson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 44, "req": "REQ0963", "role": "DevOps Engineer - Sr - Team Lead", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-04-15", "client_req": ""}, {"sno": 45, "req": "REQ0914", "role": "Software Engineer", "coe": "Data Analytics", "hm": "Amy Pecanty", "res": "Pavan Kumar Manne", "doj": "2026-03-12", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L4", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXSE002"}, {"sno": 46, "req": "REQ0992", "role": "DevOps Engineer - Sr", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 47, "req": "REQ0993", "role": "DevOps Engineer - Sr", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 48, "req": "REQ0994", "role": "DevOps Engineer - Sr", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 49, "req": "REQ0964", "role": "Devops Engineer", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 50, "req": "REQ0995", "role": "Devops Engineer", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 51, "req": "REQ0996", "role": "Devops Engineer", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 52, "req": "REQ0965", "role": "IAM Engineer", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 53, "req": "REQ0997", "role": "IAM Engineer", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 54, "req": "REQ0966", "role": "MLOps Manager", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "10", "ej": "2026-05-15", "client_req": ""}, {"sno": 55, "req": "REQ0972", "role": "AI ML Engineer", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 56, "req": "REQ0998", "role": "AI ML Engineer", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 57, "req": "REQ0977", "role": "Full stack Engineer", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-05-15", "client_req": ""}, {"sno": 58, "req": "REQ0974", "role": "Data Engineer Manager", "coe": "Data Analytics", "hm": "James Mooney", "res": "Pankaj Zaparde", "doj": "2026-05-15", "fs": "2.Offer Accepted", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "10", "ej": "2026-04-15", "client_req": ""}, {"sno": 59, "req": "REQ0959", "role": "Software Engineers (Full stack - Tech Lead)", "coe": "Data Analytics", "hm": "Josh Freeman", "res": "Krishnama Chary Dasoju", "doj": "2026-03-12", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L6", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXFS001"}, {"sno": 60, "req": "REQ0917", "role": "Devops Manager", "coe": "Cloudops", "hm": "Chris Donaldson", "res": "Arun kumar veluri", "doj": "2026-03-12", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L7", "minexp": "10", "ej": "2026-03-16", "client_req": "ACXDO001"}, {"sno": 61, "req": "REQ0975", "role": "Data Analyst", "coe": "Data Analytics", "hm": "James Mooney", "res": "ABHILASH BANDLA", "doj": "2026-04-01", "fs": "2.Offer Accepted", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-04-15", "client_req": ""}, {"sno": 62, "req": "REQ1000", "role": "Data Analyst", "coe": "Data Analytics", "hm": "James Mooney", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-04-15", "client_req": ""}, {"sno": 63, "req": "", "role": "Data Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-05-15", "client_req": ""}, {"sno": 64, "req": "", "role": "Data Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-05-15", "client_req": ""}, {"sno": 65, "req": "REQ0976", "role": "Data Engineers (Sr - DBX)", "coe": "Data Analytics", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 66, "req": "REQ1001", "role": "Data Engineers (DBX)", "coe": "Data Analytics", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 67, "req": "REQ1002", "role": "Data Engineers (DBX)", "coe": "Data Analytics", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 68, "req": "REQ1003", "role": "Data Engineer (Sr - Snowflake)", "coe": "Data Analytics", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 69, "req": "REQ0918", "role": "Data Analyst / Scientist Manager (Senior staff data scientist)", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "Jawed Khan", "doj": "2026-03-12", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L8", "minexp": "10", "ej": "2026-03-16", "client_req": "ACXSDS001"}, {"sno": 70, "req": "REQ0947", "role": "Data Analyst", "coe": "Data Analytics", "hm": "Josh Freeman", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 71, "req": "REQ0919", "role": "Staff Data Scientist", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "Siddarath", "doj": "2026-03-12", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L7", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXSDS002"}, {"sno": 72, "req": "REQ0922", "role": "Mid Level Data Analyst", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "EHTHESHAMUDDIN MOHAMMED", "doj": "2026-03-12", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L4", "minexp": "5", "ej": "2026-03-16", "client_req": "ACXDA002"}, {"sno": 73, "req": "REQ0938", "role": "Business Analyst", "coe": "PMO", "hm": "Mohsin Qureshi", "res": "Mahesh Kumar Jakkamsetti", "doj": "2026-03-12", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L4", "minexp": "8", "ej": "2026-03-16", "client_req": ""}, {"sno": 74, "req": "REQ0936", "role": "Project Management Manager", "coe": "PMO", "hm": "Crystal Wallace", "res": "Anshul Sharma", "doj": "2026-03-13", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "Laptop Handedover to user", "grade": "L8", "minexp": "10", "ej": "2026-03-16", "client_req": "ACXPMM001"}, {"sno": 75, "req": "REQ0911", "role": "QA Engineer Manager", "coe": "Apps", "hm": "Devlina Banerjee", "res": "Deepika Allena", "doj": "2026-03-16", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "2026-03-16", "grade": "L7", "minexp": "10", "ej": "2026-03-16", "client_req": "ACXQA001"}, {"sno": 76, "req": "REQ0937", "role": "Software Engineer", "coe": "Apps", "hm": "Amy Pecanty", "res": "Swapnil Astikar", "doj": "2026-03-16", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "2026-03-16", "grade": "L3", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXSE004"}, {"sno": 77, "req": "REQ0944", "role": "Software Engineer", "coe": "Apps", "hm": "Amy Pecanty", "res": "Vikitha Chilumula", "doj": "2026-03-16", "fs": "3.Onboarded", "b1": "Not Initiated", "b2": "In Progress", "it": "2026-03-16", "grade": "L3", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXSE006"}, {"sno": 78, "req": "REQ0924", "role": "Data Engineer", "coe": "Data Analytics", "hm": "LaKetra Wright", "res": "Anudeep Gulla", "doj": "2026-04-15", "fs": "3.Onboarded", "b1": "Completed", "b2": "In Progress", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 79, "req": "REQ0915", "role": "Software Engineer", "coe": "Data Analytics", "hm": "William McCoy", "res": "Venkata Raman", "doj": "2026-03-16", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "2026-03-16", "grade": "L5", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXSE007"}, {"sno": 80, "req": "REQ1004", "role": "QA Analyst", "coe": "Data Analytics", "hm": "LaKetra Wright", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-04-15", "client_req": ""}, {"sno": 81, "req": "REQ1005", "role": "QA Analyst", "coe": "Data Analytics", "hm": "LaKetra Wright", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-04-15", "client_req": ""}, {"sno": 82, "req": "", "role": "IT Process & Support Manager", "coe": "Cloudops", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "10", "ej": "2026-05-15", "client_req": ""}, {"sno": 83, "req": "", "role": "IT Process & Support Manager", "coe": "Cloudops", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-06-15", "client_req": ""}, {"sno": 84, "req": "", "role": "IT Process Engineer", "coe": "Cloudops", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 85, "req": "", "role": "IT Process Engineer", "coe": "Cloudops", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 86, "req": "REQ0920", "role": "Senior Data Scientist", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "Santosh Nakka", "doj": "2026-03-16", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "", "grade": "L5", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXDS001"}, {"sno": 87, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 88, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 89, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-05-15", "client_req": ""}, {"sno": 90, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 91, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 92, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 93, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 94, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 95, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-06-15", "client_req": ""}, {"sno": 96, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 97, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 98, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 99, "req": "", "role": "Support Engineer", "coe": "Data Analytics", "hm": "Sonny Bradley", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "5", "ej": "2026-06-15", "client_req": ""}, {"sno": 100, "req": "REQ0923", "role": "AI ML Engineer (Mid level MLOps engineer)", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "Sindhuri Rompikuntla", "doj": "2026-03-16", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "2026-03-16", "grade": "L3", "minexp": "5", "ej": "2026-03-16", "client_req": "ACXML001"}, {"sno": 101, "req": "REQ0926", "role": "Scrum Master", "coe": "PMO", "hm": "Angie Graves", "res": "Christy Daffni T", "doj": "2026-03-16", "fs": "3.Onboarded", "b1": "In Progress", "b2": "In Progress", "it": "2026-03-16", "grade": "L6", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXSM001"}, {"sno": 102, "req": "REQ0941", "role": "Software Engineer", "coe": "Apps", "hm": "Amy Pecanty", "res": "Manisundar Perumalla", "doj": "2026-03-20", "fs": "2.Offer Accepted", "b1": "In Progress", "b2": "Not Completed", "it": "", "grade": "L3", "minexp": "3", "ej": "2026-03-16", "client_req": "ACXSE005"}, {"sno": 103, "req": "REQ0946", "role": "Sr. Data Scientist", "coe": "Data Analytics", "hm": "Raj Srinivasan", "res": "JEYANTH KRISHNA NEELISETTY", "doj": "2026-03-20", "fs": "2.Offer Accepted", "b1": "Completed", "b2": "In Progress", "it": "2026-03-20", "grade": "L5", "minexp": "8", "ej": "2026-03-16", "client_req": "ACXDS002"}, {"sno": 104, "req": "REQ0969", "role": "Product Owner/Manager", "coe": "PMO", "hm": "Ben Balogh", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "10", "ej": "2026-04-15", "client_req": ""}, {"sno": 105, "req": "REQ0970", "role": "Lead Developer", "coe": "PMO", "hm": "Ben Balogh", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-04-15", "client_req": ""}, {"sno": 106, "req": "REQ0971", "role": "Developer", "coe": "PMO", "hm": "Ben Balogh", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 107, "req": "REQ1006", "role": "Developer", "coe": "PMO", "hm": "Ben Balogh", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "3", "ej": "2026-04-15", "client_req": ""}, {"sno": 108, "req": "REQ0939", "role": "Scrum Master", "coe": "PMO", "hm": "Angie Graves", "res": "Dipen Patel", "doj": "2026-05-15", "fs": "3.Onboarded", "b1": "Completed", "b2": "Completed", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 109, "req": "REQ0940", "role": "Scrum Master", "coe": "PMO", "hm": "Angie Graves", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 110, "req": "REQ0942", "role": "Scrum Master", "coe": "PMO", "hm": "Angie Graves", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 111, "req": "REQ0943", "role": "Scrum Master", "coe": "PMO", "hm": "Angie Graves", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 112, "req": "", "role": "Software Engineer", "coe": "Data Analytics", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}, {"sno": 113, "req": "", "role": "Senior Software Engineer", "coe": "Data Analytics", "hm": "Chris Donaldson", "res": "", "doj": "", "fs": "1.WIP", "b1": "Not Initiated", "b2": "Not Initiated", "it": "", "grade": "", "minexp": "8", "ej": "2026-05-15", "client_req": ""}];
+
+const PROG_C1=[{"a": "Preparation", "o": "Kumar K.", "r": "Amij P.", "s": "Done", "e": "2026-02-27", "src": "plan"}, {"a": "Finalize Offshore location", "o": "Amij P.", "r": "Ankur J.", "s": "Done", "e": "2026-02-27", "src": "plan"}, {"a": "Set up local leadership", "o": "Chintan M.", "r": "Abhishek S.", "s": "Done", "e": "2026-02-27", "src": "plan"}, {"a": "Sign contract(s) with Anblicks", "o": "Kumar K.", "r": "Ankur J.", "s": "Done", "e": "2026-02-20", "src": "plan"}, {"a": "Infrastructure & set up", "o": "Amij P.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-27", "src": "plan"}, {"a": "Design Security & Privacy controls", "o": "Sourabh G.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-25", "src": "plan"}, {"a": "Identity & access controls (AD, MFA, RBAC) set up", "o": "Dhaval R.", "r": "Sourabh G.", "s": "InProgress", "e": "2026-03-25", "src": "plan"}, {"a": "Endpoint protection (anti-malware, EDR, SecOps, Runbook) set up", "o": "Dhaval R.", "r": "Sourabh G.", "s": "Done", "e": "2026-03-25", "src": "plan"}, {"a": "Network & Connectivity Controls (VPN) set up", "o": "Dhaval R.", "r": "Sourabh G.", "s": "InProgress", "e": "2026-03-27", "src": "plan"}, {"a": "Application control & software governance set up", "o": "Dhaval R.", "r": "Sourabh G.", "s": "InProgress", "e": "2026-03-25", "src": "plan"}, {"a": "Data protection, DLP, PII / PCI / PHI access & protection rules set up", "o": "Dhaval R.", "r": "Sourabh G.", "s": "InProgress", "e": "2026-03-25", "src": "plan"}, {"a": "Logging, Monitoring & Compliance set up", "o": "Dhaval R.", "r": "Sourabh G.", "s": "InProgress", "e": "2026-03-25", "src": "plan"}, {"a": "User Support Foundation set up including remote support model", "o": "Sourabh G.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-25", "src": "plan"}, {"a": "Laptop readiness", "o": "Amij P.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-28", "src": "plan"}, {"a": "Golden image set up with security tools, VPN client, VDI client & mandatory softwares", "o": "Sourabh G.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-20", "src": "plan"}, {"a": "VDI environment set up", "o": "Sourabh G.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-20", "src": "plan"}, {"a": "Laptop procurement & set up", "o": "Dhaval R.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-20", "src": "plan"}, {"a": "Day-0 checklist", "o": "Dhaval R.", "r": "Sourabh G.", "s": "Done", "e": "2026-03-28", "src": "plan"}, {"a": "User support setup", "o": "Dhaval R.", "r": "Dhaval R.", "s": "InProgress", "e": "2026-03-20", "src": "plan"}, {"a": "Talent Development set up", "o": "Abhishek S.", "r": "Deb S.", "s": "Done", "e": "2026-03-13", "src": "plan"}, {"a": "Training program outline (what, when, success criteria) - Acxiom", "o": "Amy E.", "r": "Deb S.", "s": "Done", "e": "2026-03-13", "src": "plan"}, {"a": "Prepare Training materials", "o": "Abhishek S.", "r": "Deb S.", "s": "InProgress", "e": "2026-04-17", "src": "plan"}, {"a": "ACX overview, offerings, culture, ways of working", "o": "Amy E.", "r": "Deb S.", "s": "Done", "e": "2026-03-13", "src": "plan"}, {"a": "Security & compliance", "o": "Amy E.", "r": "Deb S.", "s": "Done", "e": "2026-03-13", "src": "plan"}, {"a": "Core work fundamentals (SDLC, Cloud basics, Data platform basics, product basics)", "o": "Amy E.", "r": "Deb S.", "s": "Done", "e": "2026-03-27", "src": "plan"}, {"a": "Technology deep dive based on work area (Engineering, Products, Solutions etc.)", "o": "Amy E.", "r": "Deb S.", "s": "Done", "e": "2026-04-17", "src": "plan"}, {"a": "Define mentoring program & results tracking mechanism", "o": "Amy E.", "r": "Deb S.", "s": "Open", "e": "2026-03-20", "src": "plan"}, {"a": "Identify US mentors & cohorts", "o": "Amy E.", "r": "Deb S.", "s": "Open", "e": "2026-03-20", "src": "plan"}, {"a": "Define 30 / 60 / 90 days of onboarding activities & progression", "o": "Amy E.", "r": "Deb S.", "s": "Done", "e": "2026-03-20", "src": "plan"}, {"a": "Identify US Cohorts", "o": "Amy E.", "r": "Deb S.", "s": "InProgress", "e": "2026-03-27", "src": "plan"}, {"a": "Build mentor (US) - mentee roster", "o": "Amy E.", "r": "Deb S.", "s": "InProgress", "e": "2026-03-27", "src": "plan"}, {"a": "Talent Acquisition", "o": "Abhishek S.", "r": "Indranil G.", "s": "Done", "e": "2026-03-13", "src": "plan"}, {"a": "Define roles & job descriptions", "o": "Abhishek S.", "r": "Faiyaz M.", "s": "Done", "e": "2026-03-13", "src": "plan"}, {"a": "Conduct interviews and identify candidates for each cohort", "o": "Abhishek S.", "r": "Faiyaz M.", "s": "InProgress", "e": "2026-06-12", "src": "plan"}, {"a": "Cohort 1", "o": "Abhishek S.", "r": "Faiyaz M.", "s": "Done", "e": "2026-03-13", "src": "plan"}, {"a": "Cohort 2", "o": "Abhishek S.", "r": "Faiyaz M.", "s": "InProgress", "e": "2026-04-14", "src": "plan"}, {"a": "Cohort 3", "o": "Abhishek S.", "r": "Faiyaz M.", "s": "Open", "e": "2026-05-14", "src": "plan"}, {"a": "Cohort 4", "o": "Abhishek S.", "r": "Faiyaz M.", "s": "Open", "e": "2026-06-12", "src": "plan"}, {"a": "Establish success criteria & measurement mechanism", "o": "Abhishek S.", "r": "Indranil G.", "s": "Done", "e": "2026-02-27", "src": "plan"}, {"a": "Onboarding & Ramp up", "o": "Chintan M.", "r": "Indranil G.", "s": "InProgress", "e": "2026-11-15", "src": "plan"}, {"a": "Cohort 1", "o": "Chintan M.", "r": "Indranil G.", "s": "InProgress", "e": "2026-06-05", "src": "plan"}, {"a": "Resources joined & laptops handed over", "o": "Chintan M.", "r": "Dhaval R.", "s": "Done", "e": "2026-03-16", "src": "plan"}, {"a": "Onboarding and overview trainings - Week 1", "o": "Deb S.", "r": "Deb S.", "s": "InProgress", "e": "2026-03-20", "src": "plan"}, {"a": "Boot camp (HR Overview, Compliance, fundamentals) - Week 2, 3", "o": "Deb S.", "r": "Deb S.", "s": "Open", "e": "2026-04-03", "src": "plan"}, {"a": "Introduce to mentors", "o": "Amy E.", "r": "Deb S.", "s": "Open", "e": "2026-04-03", "src": "plan"}, {"a": "Technology deep dive - week 4", "o": "Amy E.", "r": "Deb S.", "s": "Open", "e": "2026-04-10", "src": "plan"}, {"a": "Shadow in actual project / product / engineering work (M2)", "o": "Chintan M.", "r": "Indranil G.", "s": "Open", "e": "2026-05-08", "src": "plan"}, {"a": "Transition to hands on roles (M3)", "o": "Chintan M.", "r": "Indranil G.", "s": "Open", "e": "2026-06-05", "src": "plan"}, {"a": "Track performance of new hires and onboarding process", "o": "Chintan M.", "r": "Deb S.", "s": "Open", "e": "2026-06-05", "src": "plan"}, {"a": "Cohort 2", "o": "Chintan M.", "r": "Indranil G.", "s": "Open", "e": "2026-06-08", "src": "plan"}, {"a": "Resources joined & laptops handed over", "o": "Chintan M.", "r": "Dhaval R.", "s": "Open", "e": "2026-04-15", "src": "plan"}, {"a": "Onboarding and overview trainings - Week 1", "o": "Deb S.", "r": "Deb S.", "s": "Open", "e": "2026-04-20", "src": "plan"}, {"a": "Boot camp (HR Overview, Compliance, fundamentals) - Week 2, 3", "o": "Deb S.", "r": "Deb S.", "s": "Open", "e": "2026-04-27", "src": "plan"}, {"a": "Introduce to mentors", "o": "Amy E.", "r": "Deb S.", "s": "Open", "e": "2026-04-27", "src": "plan"}, {"a": "Technology deep dive - week 4", "o": "Amy E.", "r": "Deb S.", "s": "Open", "e": "2026-05-04", "src": "plan"}, {"a": "Shadow in actual project / product / engineering work (M2)", "o": "Chintan M.", "r": "Indranil G.", "s": "Open", "e": "2026-05-11", "src": "plan"}, {"a": "Transition to hands on roles (M3)", "o": "Chintan M.", "r": "Indranil G.", "s": "Open", "e": "2026-06-08", "src": "plan"}, {"a": "Track performance of new hires and onboarding process", "o": "Chintan M.", "r": "Deb S.", "s": "Open", "e": "2026-06-08", "src": "plan"}, {"a": "Cohort 3", "o": "Chintan M.", "r": "", "s": "Open", "e": "", "src": "plan"}, {"a": "Cohort 4", "o": "Chintan M.", "r": "", "s": "Open", "e": "", "src": "plan"}, {"a": "Operations & Governance set up completed", "o": "Chintan M.", "r": "", "s": "Open", "e": "2026-04-10", "src": "plan"}, {"a": "Itinerary Finalization and Stakeholder Alignment to be done - Pune and Hyderabad", "o": "Chintan M.", "r": "Travel", "s": "Done", "e": "2026-02-15", "src": "action_items", "area": "Customer Visits: Logistics, agendas, and stakeholder alignment."}, {"a": "Office Walkthrough and Introduction Meetings with Team - Pune and Hyderabad", "o": "Amij P.", "r": "Agendas", "s": "Done", "e": "2026-02-23", "src": "action_items", "area": "Customer Visits: Logistics, agendas, and stakeholder alignment."}, {"a": "Pune Deck (Capabilities, Databricks, Pune office location glimpse) and Hyderabad Deck (Anblicks Intro, Capabilities, Enablement Team Intro, GCC Managers Intro, Solutions we created for other customers, Acxiom/Anblicks journey so far)", "o": "Gowtham V.", "r": "Agendas", "s": "Done", "e": "2026-02-23", "src": "action_items", "area": "Customer Visits: Logistics, agendas, and stakeholder alignment."}, {"a": "Customer Visits: Logistics, agendas, and stakeholder alignment. Office Setup: Infrastructure readiness and workspace finalization. Sourcing: Pipeline velocity and candidate quality tracking. Onboarding: Compliance, equipment, and Day-1 readiness. Sprints & Outcomes: Technical delivery milestones and performance reporting.", "o": "Chintan M.", "r": "Program Management", "s": "Done", "e": "2026-02-20", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "Comprehensive Budget - HR, RMG, IT, Facilities, Delivery", "o": "Amij P.", "r": "Finance", "s": "Done", "e": "2026-02-25", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "Pipeline Velocity plan along with current team members aligned", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-15", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "Interview Panel", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-20", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "JD Discussion on all requirements-Cohort1", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-17", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "JD Mapping with requirements along with onboarding month - Cohort 1", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-27", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "JD Mapping with requirements along with onboarding month - Cohort 2", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-03-01", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "JD Mapping with requirements along with onboarding month - Cohort 3", "o": "Abhishek S.", "r": "TA", "s": "InProgress", "e": "2026-04-01", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "JD Mapping with requirements along with onboarding month - Cohort 4", "o": "Abhishek S.", "r": "TA", "s": "InProgress", "e": "2026-05-01", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "JD Mapping with requirements along with pyramid", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-27", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "Candidate Quality Tracking Process", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-25", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "Map Current available resources against needs", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-20", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "Create job req IDs and share ATS dashboard", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-15", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "Prepare mapping sheet and send to Indy", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-13", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "Validate complex or manager‑level hires with US SMEs", "o": "Abhishek S.", "r": "TA", "s": "Done", "e": "2026-02-17", "src": "action_items", "area": "Sourcing: Pipeline velocity and candidate quality tracking."}, {"a": "Enablement team onboarding", "o": "Abhishek S.", "r": "L&D", "s": "Done", "e": "2026-03-16", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Onboarding induction plan", "o": "Deb S.", "r": "L&D", "s": "Done", "e": "2026-03-13", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Review 4‑month milestone plan with Indranil (ACX)", "o": "Chintan M.", "r": "L&D", "s": "Done", "e": "2026-02-20", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Office Setup and Equipments (Laptops, Monitors and such) to be managed", "o": "Dhaval R.", "r": "IT", "s": "InProgress", "e": "2026-03-28", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "HR & RMG Onboarding checklist including BGV", "o": "Abhishek S.", "r": "RMG", "s": "Done", "e": "2026-03-13", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Laptop/VDI Arrangements", "o": "Dhaval R.", "r": "IT", "s": "InProgress", "e": "2026-03-20", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "IT Onboarding checklist", "o": "Dhaval R.", "r": "IT", "s": "Done", "e": "2026-03-13", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "ACX Onboarding Process and Checklist", "o": "Sandhya M.", "r": "HR", "s": "Done", "e": "2026-03-13", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "ACX Requirements for Security and standards for Office", "o": "Amij P.", "r": "Operations", "s": "Done", "e": "2026-02-20", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Office Setup - Alternatives and Plan along with dates", "o": "Amij P.", "r": "Facilities", "s": "Done", "e": "2026-02-27", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Desk Allocation for Manager & Engineers", "o": "Sandhya M.", "r": "Facilities", "s": "Done", "e": "2026-03-13", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Timesheet Tracking, Project allocation, Total Hrs. tracking along with planned v/s actual", "o": "Nishit T.", "r": "RMG", "s": "InProgress", "e": "2026-03-11", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Finalize RACI and share with all teams", "o": "Zack", "r": "Program Management", "s": "InProgress", "e": "2026-03-20", "src": "action_items", "area": "Onboarding: Compliance, equipment, and Day-1 readiness."}, {"a": "Draft governance dashboard (single slide)", "o": "Chintan M.", "r": "Program Management", "s": "Done", "e": "2026-03-15", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "Conduct whiteboard session on holiday / on‑call model", "o": "Chintan M.", "r": "Program Management", "s": "Open", "e": "2026-03-25", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "Quality Gates discussion with ACX Team", "o": "Chintan M.", "r": "Program Management", "s": "InProgress", "e": "2026-03-25", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "KPI Monitoring and Tools", "o": "Chintan M.", "r": "Program Management", "s": "InProgress", "e": "2026-03-25", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "Steering Committee Meetings - ACX & AB Stakeholders - Monthly for 4 months for GCC onboarding", "o": "Chintan M.", "r": "Program Management", "s": "Done", "e": "2026-03-01", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "Steering Committee Meetings - ACX & AB Stakeholders - Monthly for project/programs overview", "o": "Chintan M.", "r": "Program Management", "s": "InProgress", "e": "2026-04-10", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}, {"a": "Review Meetings - ACX & AB - Monthly - Focused within Managers/Project Managers/Product Managers", "o": "Chintan M.", "r": "Program Management", "s": "Open", "e": "2026-04-10", "src": "action_items", "area": "Sprints & Outcomes: Technical delivery milestones and performance reporting."}];
+
+// ═══════════════════ HELPERS ═══════════════════
+let ACF='all';
+let ACHMF='all';
+function coh(r){const e=r.ej;if(!e)return 4;if(e<='2026-03-31')return 1;if(e<='2026-04-30')return 2;if(e<='2026-05-31')return 3;return 4;}
+const CLBL=['','Cohort 1 – Mar 2026','Cohort 2 – Apr 2026','Cohort 3 – May 2026','Cohort 4 – Jun 2026'];
+
+function bd(t,c){return`<span class="b b${c}">${t}</span>`;}
+function sBadge(s){
+  if(!s)return bd('—','s');const l=s.toLowerCase();
+  if(l==='done'||l==='completed'||l==='closed')return bd(s,'g');
+  if(l==='inprogress'||l==='in progress'||l==='initiated')return bd(s,'a');
+  if(l==='open'||l==='not initiated')return bd(s,'s');
+  if(l.includes('pending')||l.includes('not completed'))return bd(s,'r');
+  return bd(s,'a');
+}
+function bgvB(s){
+  if(!s||s==='Not Initiated')return bd('Not Initiated','s');
+  if(s==='Completed')return bd('Completed','g');
+  if(s==='Initiated')return bd('Initiated','a');
+  if(s.toLowerCase().includes('pending')||s.toLowerCase().includes('not completed'))return bd(s,'r');
+  return bd(s,'a');
+}
+function fsBadge(s){
+  if(s==='3.Onboarded')return bd('Onboarded','g');
+  if(s==='2.Offer Accepted')return bd('Offer Accepted','a');
+  return bd('WIP','i');
+}
+function pbar(d,t,col='var(--teal)'){
+  const p=t?Math.round(d/t*100):0;
+  return`<div style="display:flex;align-items:center;gap:5px"><div class="pw" style="flex:1"><div class="pf" style="width:${p}%;background:${col}"></div></div><span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;width:38px">${d}/${t}</span></div>`;
+}
+function tli(lbl,s,owner){
+  const c={Done:'var(--green)',InProgress:'var(--amber)',Open:'var(--slate)'}[s]||'var(--slate)';
+  const ownerHtml=owner?`<span style="font-size:10px;color:var(--muted);margin-right:4px">👤 ${owner}</span>`:'';
+  return`<li class="tli"><span class="tdot" style="background:${c}"></span><span style="flex:1">${lbl}</span>${ownerHtml}${sBadge(s)}</li>`;
+}
+function normB(s){
+  if(!s||s==='Not Initiated')return'open';
+  const l=s.toLowerCase();
+  if(l==='completed')return'done';
+  return'wip';
+}
+function filt(){
+  let d=ACF==='all'?H:H.filter(r=>coh(r)===ACF);
+  if(ACHMF!=='all') d=d.filter(r=>r.hm===ACHMF);
+  return d;
+}
+
+// ═══════════════════ TOP KPI STRIP ═══════════════════
+function renderStrip(){
+  const d=filt();
+  const onb=d.filter(r=>r.fs==='3.Onboarded').length;
+  const off=d.filter(r=>r.fs==='2.Offer Accepted').length;
+  const wip=d.filter(r=>r.fs==='1.WIP').length;
+  const tot=d.length;
+  const act=H.filter(r=>r.fs==='3.Onboarded'||r.fs==='2.Offer Accepted');
+  const bgv1d=act.filter(r=>normB(r.b1)==='done').length;
+  const bgv1w=act.filter(r=>normB(r.b1)==='wip').length;
+  const bgv2d=act.filter(r=>normB(r.b2)==='done').length;
+  const pdc=PROG_C1.filter(r=>r.s==='Done').length;
+  const pic=PROG_C1.filter(r=>r.s==='InProgress').length;
+  const poc=PROG_C1.filter(r=>r.s==='Open').length;
+  document.getElementById('kpi-strip').innerHTML=`
+  <div class="ks" onclick="openDrill('hiring')" title="Click to drill down"><div class="ks-bar" style="background:var(--teal)"></div>
+    <div class="ks-lbl">Hiring ${ACF!=='all'?'· '+CLBL[ACF]:''} <span style="font-size:9px;color:var(--teal)">▼ drill</span></div>
+    <div class="ks-big" style="color:var(--green)">${onb}<span style="font-size:13px;font-weight:400;color:var(--muted)"> / ${tot}</span></div>
+    <div class="ks-chips">${bd(onb+' Onboarded','g')}${bd(off+' Offer','a')}${bd(wip+' WIP','i')}</div>
+  </div>
+  <div class="ks" onclick="openDrill('ld')" title="Click to drill down"><div class="ks-bar" style="background:var(--purple)"></div>
+    <div class="ks-lbl">L&D / Training <span style="font-size:9px;color:var(--purple)">▼ drill</span></div>
+    <div class="ks-big" style="color:var(--green)">6<span style="font-size:13px;font-weight:400;color:var(--muted)"> / 12</span></div>
+    <div class="ks-chips">${bd('6 Done','g')}${bd('4 In Progress','a')}${bd('2 Open','s')}</div>
+  </div>
+  <div class="ks" onclick="openDrill('it')" title="Click to drill down"><div class="ks-bar" style="background:var(--teal)"></div>
+    <div class="ks-lbl">IT &amp; Infrastructure <span style="font-size:9px;color:var(--teal)">▼ drill</span></div>
+    <div class="ks-big" style="color:var(--amber)">14<span style="font-size:13px;font-weight:400;color:var(--muted)"> in prog</span></div>
+    <div class="ks-chips">${bd('1 Done','g')}${bd('14 In Progress','a')}${bd('0 Open','s')}</div>
+  </div>
+  <div class="ks" onclick="openDrill('bgv')" title="Click to drill down"><div class="ks-bar" style="background:#B45309"></div>
+    <div class="ks-lbl">BGV (Active, ${act.length}) <span style="font-size:9px;color:#B45309">▼ drill</span></div>
+    <div class="ks-big" style="color:var(--green)">${bgv1d}<span style="font-size:13px;font-weight:400;color:var(--muted)"> Stg1 ✓</span></div>
+    <div class="ks-chips">${bd(bgv2d+' Stg2 Done','g')}${bd(bgv1w+' Stg1 WIP','a')}</div>
+  </div>
+  <div class="ks" onclick="openDrill('prog')" title="Click to drill down"><div class="ks-bar" style="background:var(--navy)"></div>
+    <div class="ks-lbl">Program (C1 scope) <span style="font-size:9px;color:var(--navy)">▼ drill</span></div>
+    <div class="ks-big" style="color:var(--teal)">${pdc}<span style="font-size:13px;font-weight:400;color:var(--muted)"> / ${PROG_C1.length}</span></div>
+    <div class="ks-chips">${bd(pdc+' Done','g')}${bd(pic+' In Prog','a')}${bd(poc+' Open','s')}</div>
+  </div>`;
+}
+
+// ═══════════════════ 1. HIRING ═══════════════════
+function renderHiring(){
+  const d=filt();
+  const onb=d.filter(r=>r.fs==='3.Onboarded').length;
+  const off=d.filter(r=>r.fs==='2.Offer Accepted').length;
+  const wip=d.filter(r=>r.fs==='1.WIP').length;
+  const tot=d.length;
+  document.getElementById('h-flbl').textContent=ACF!=='all'?'· '+CLBL[ACF]:'';
+  document.getElementById('h-stats').innerHTML=`
+    <div class="sp" style="background:var(--greenlt)"><div class="n" style="color:var(--green)">${onb}</div><div class="l" style="color:var(--green)">Onboarded</div></div>
+    <div class="sp" style="background:var(--amberlt)"><div class="n" style="color:var(--amber)">${off}</div><div class="l" style="color:var(--amber)">Offer Accepted</div></div>
+    <div class="sp" style="background:var(--indigolt)"><div class="n" style="color:var(--indigo)">${wip}</div><div class="l" style="color:var(--indigo)">WIP</div></div>
+    <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--navy)">${tot}</div><div class="l" style="color:var(--muted)">Total</div></div>`;
+  document.getElementById('h-sbar').innerHTML=`
+    <div class="sseg" style="flex:${onb||0.01};background:var(--green)"></div>
+    <div class="sseg" style="flex:${off||0.01};background:var(--amber)"></div>
+    <div class="sseg" style="flex:${wip||0.01};background:#C7D2E8"></div>`;
+  document.getElementById('h-sleg').innerHTML=`
+    <div class="sleg-i"><div class="sdot" style="background:var(--green)"></div>${tot?Math.round(onb/tot*100):0}% Onboarded</div>
+    <div class="sleg-i"><div class="sdot" style="background:var(--amber)"></div>${tot?Math.round(off/tot*100):0}% Offer Accepted</div>
+    <div class="sleg-i"><div class="sdot" style="background:#C7D2E8"></div>${tot?Math.round(wip/tot*100):0}% WIP</div>`;
+  // Cohort table — Onboarded | Offer Accepted | WIP order
+  const show=ACF==='all'?[1,2,3,4]:[ACF];
+  let html='';
+  show.forEach(c=>{
+    const cr=H.filter(r=>coh(r)===c);
+    const nb=cr.filter(r=>r.fs==='3.Onboarded').length;
+    const of=cr.filter(r=>r.fs==='2.Offer Accepted').length;
+    const w=cr.filter(r=>r.fs==='1.WIP').length;
+    const t=cr.length;
+    html+=`<tr onclick="openMod(${c})" title="Click to drill down">
+      <td>${CLBL[c]}</td>
+      <td><span style="color:var(--green);font-weight:600">${nb}</span></td>
+      <td><span style="color:var(--amber);font-weight:600">${of}</span></td>
+      <td><span style="color:var(--indigo);font-weight:600">${w}</span></td>
+      <td><strong>${t}</strong></td>
+      <td style="min-width:130px">${pbar(nb,t,'var(--green)')}</td>
+    </tr>`;
+  });
+  if(ACF==='all') html+=`<tr class="tr-tot"><td>Grand Total</td><td style="color:var(--green)">${onb}</td><td style="color:var(--amber)">${off}</td><td style="color:var(--indigo)">${wip}</td><td>${tot}</td><td>${pbar(onb,tot,'var(--green)')}</td></tr>`;
+  document.getElementById('h-tbody').innerHTML=html;
+  renderPyramid(d);
+}
+
+// ═══════════════════ PYRAMID ═══════════════════
+function renderPyramid(d){
+  // Grade bands L1-L3=Junior, L4-L5=Mid, L6-L7=Senior, L8+=Leadership
+  const graded=d.filter(r=>r.grade&&r.grade.match(/^L\d+$/));
+  const bands=[
+    {lbl:'Leadership (L8+)', grades:['L8','L9','L10'], col:'#0D1B3E'},
+    {lbl:'Senior (L6–L7)',   grades:['L6','L7'],       col:'#0A7E8C'},
+    {lbl:'Mid-Level (L4–L5)',grades:['L4','L5'],       col:'#4338CA'},
+    {lbl:'Junior (L1–L3)',   grades:['L1','L2','L3'],  col:'#16A34A'},
+  ];
+  bands.forEach(b=>{ b.cnt=graded.filter(r=>b.grades.includes(r.grade)).length; });
+  const total=bands.reduce((s,b)=>s+b.cnt,0)||1;
+
+  const svgW=220, svgH=200, pad=10;
+  const usableH=svgH-pad*2;
+  const maxW=svgW-20;
+  let svgParts='';
+  let y=pad;
+  const segH=usableH/bands.length;
+  bands.forEach((b,i)=>{
+    const frac=(total>0?b.cnt/total:0);
+    const w=Math.max(30, maxW*(0.25+(i*0.25))); // pyramid: leadership narrow at top
+    const x=(svgW-w)/2;
+    const rx=6;
+    svgParts+=`<rect x="${x}" y="${y}" width="${w}" height="${segH-3}" rx="${rx}" fill="${b.col}" opacity="${0.85+i*0.04}"/>`;
+    svgParts+=`<text x="${svgW/2}" y="${y+segH/2+1}" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="11" font-weight="600" font-family="DM Sans,sans-serif">${b.cnt}</text>`;
+    y+=segH;
+  });
+  document.getElementById('pyr-svg').innerHTML=svgParts;
+
+  document.getElementById('pyr-legend').innerHTML=bands.map((b,i)=>{
+    const pct=total>0?Math.round(b.cnt/total*100):0;
+    return`<div class="pyr-leg-row">
+      <div class="pyr-leg-dot" style="background:${b.col}"></div>
+      <div class="pyr-leg-lbl">${b.lbl}</div>
+      <div class="pyr-leg-cnt">${b.cnt}</div>
+      <div class="pyr-leg-pct">&nbsp;(${pct}%)</div>
+    </div>`;
+  }).join('');
+
+  // Populate min experience table
+  const expData=[
+    {band:'Leadership (L8+)',  cnt:bands[0].cnt, minExp:'12+ years', roles:'Manager, Director, Principal'},
+    {band:'Senior (L6–L7)',    cnt:bands[1].cnt, minExp:'7–11 years', roles:'Sr. Team Lead, Staff Engineer'},
+    {band:'Mid-Level (L4–L5)', cnt:bands[2].cnt, minExp:'3–6 years', roles:'Senior Engineer, Tech Lead'},
+    {band:'Junior (L1–L3)',    cnt:bands[3].cnt, minExp:'0–2 years', roles:'Engineer, Analyst, Associate'},
+  ];
+  document.getElementById('pyr-exp-tbody').innerHTML=expData.map(r=>`<tr>
+    <td><strong>${r.band}</strong></td>
+    <td style="font-weight:700;color:var(--navy)">${r.cnt}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">${r.minExp}</td>
+    <td style="font-size:11px;color:var(--muted)">${r.roles}</td>
+  </tr>`).join('');
+}
+
+function togglePyrExp(){
+  const panel=document.getElementById('pyr-exp-panel');
+  const btn=document.getElementById('pyr-exp-btn');
+  const on=panel.classList.toggle('on');
+  btn.textContent=on?'▾ Min. Exp. Detail':'▸ Min. Exp. Detail';
+}
+
+// ═══════════════════ 2. L&D ═══════════════════
+function renderLD(){
+  document.getElementById('ld-stats').innerHTML=`
+    <div class="sp" style="background:var(--greenlt)"><div class="n" style="color:var(--green)">6</div><div class="l" style="color:var(--green)">Done</div></div>
+    <div class="sp" style="background:var(--amberlt)"><div class="n" style="color:var(--amber)">4</div><div class="l" style="color:var(--amber)">In Progress</div></div>
+    <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--muted)">2</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+  const setup=[
+    ['Training Program Outline & Success Criteria','Done','Abhishek S.'],
+    ['ACX Overview, Culture & Ways of Working','Done','Deb S.'],
+    ['Security & Compliance Training','Done','Deb S.'],
+    ['Core Work Fundamentals (SDLC, Cloud, Data)','Done','Deb S.'],
+    ['Technology Deep Dive by Work Area','Done','Deb S.'],
+    ['Talent Development Set Up','Done','Abhishek S.'],
+    ['Prepare Training Materials','InProgress','Deb S.'],
+    ['Define 30/60/90 Day Onboarding Plan','InProgress','Amy E.'],
+    ['Identify US Cohorts & Build Mentor Roster','InProgress','Amy E.'],
+    ['Prepare Training Materials (full)','InProgress','Deb S.'],
+    ['Define Mentoring Program & Tracking','Open','Amy E.'],
+    ['Identify US Mentors','Open','Amy E.'],
+  ];
+  const c1=[
+    ['Onboarding & Overview Trainings – Week 1','Done','Deb S.'],
+    ['Boot Camp (HR, Compliance, Fundamentals) – Wk 2 & 3','InProgress','Deb S.'],
+    ['Introduce to Mentors','Open','Chintan M.'],
+    ['Technology Deep Dive – Week 4','Open','Chintan M.'],
+    ['Shadow Actual Project – Month 2','Open','Chintan M.'],
+    ['Transition to Hands-on Roles – Month 3','Open','Chintan M.'],
+    ['Track Performance of New Hires','Open','Chintan M.'],
+  ];
+  const c2=[
+    ['Onboarding & Overview Trainings – Week 1 (C2)','InProgress','Deb S.'],
+    ['Boot Camp – Week 2 & 3 (C2)','Open','Deb S.'],
+    ['Introduce to Mentors (C2)','Open','Chintan M.'],
+    ['Technology Deep Dive – Week 4 (C2)','Open','Chintan M.'],
+    ['Shadow Actual Project – Month 2 (C2)','Open','Chintan M.'],
+    ['Transition to Hands-on Roles (C2)','Open','Chintan M.'],
+    ['Track Performance (C2)','Open','Chintan M.'],
+  ];
+  _ldSetup=setup; _ldC1=c1; _ldC2=c2; LD_TAB_FILTER='all';
+  document.getElementById('ld-setup-list').innerHTML=setup.map(([l,s,o])=>tli(l,s,o)).join('');
+  document.getElementById('ld-c1-list').innerHTML=c1.map(([l,s,o])=>tli(l,s,o)).join('');
+  document.getElementById('ld-c2-list').innerHTML=c2.map(([l,s,o])=>tli(l,s,o)).join('');
+}
+
+// ═══════════════════ 3. IT ═══════════════════
+function renderIT(){
+  document.getElementById('it-stats').innerHTML=`
+    <div class="sp" style="background:var(--greenlt)"><div class="n" style="color:var(--green)">1</div><div class="l" style="color:var(--green)">Done</div></div>
+    <div class="sp" style="background:var(--amberlt)"><div class="n" style="color:var(--amber)">14</div><div class="l" style="color:var(--amber)">In Progress</div></div>
+    <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--muted)">0</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+  const cats={
+    'it-sec-l':[
+      ['Infrastructure & Setup (overall)','InProgress','Amij P.'],
+      ['Design Security & Privacy Controls','InProgress','Dhaval R.'],
+      ['Identity & Access Controls (AD, MFA, RBAC)','InProgress','Dhaval R.'],
+      ['Data Protection, DLP, PII/PCI/PHI Rules','InProgress','Amij P.'],
+      ['Logging, Monitoring & Compliance','InProgress','Dhaval R.'],
+    ],
+    'it-ep-l':[
+      ['Endpoint Protection (EDR, SecOps, Runbook)','InProgress','Dhaval R.'],
+      ['Network & Connectivity Controls (VPN)','InProgress','Dhaval R.'],
+      ['Application Control & Software Governance','InProgress','Amij P.'],
+    ],
+    'it-lap-l':[
+      ['Laptop Readiness & Distribution','InProgress','Dhaval R.'],
+      ['Golden Image Setup (Security Tools, VPN, VDI)','InProgress','Dhaval R.'],
+      ['VDI Environment Setup','InProgress','Amij P.'],
+      ['Laptop Procurement & Setup','InProgress','Dhaval R.'],
+    ],
+    'it-sup-l':[
+      ['User Support Foundation Setup','InProgress','Dhaval R.'],
+      ['Remote Support Model Setup','InProgress','Dhaval R.'],
+      ['Day-0 Checklist','InProgress','Dhaval R.'],
+    ],
+  };
+  _itItems=cats; IT_TAB_FILTER='all';
+  Object.entries(cats).forEach(([id,items])=>{
+    document.getElementById(id).innerHTML=items.map(([l,s,o])=>tli(l,s,o)).join('');
+  });
+}
+
+// ═══════════════════ 4. HR & BGV ═══════════════════
+function renderBGVBoxes(filtered){
+  const src=filtered||H;
+  function box(rows,lbl){
+    const s1={done:0,wip:0,open:0},s2={done:0,wip:0,open:0};
+    rows.forEach(r=>{s1[normB(r.b1)]++;s2[normB(r.b2)]++;});
+    return`<div class="bgv-box">
+      <div class="bgv-box-title">${lbl} (${rows.length})</div>
+      <div class="bgv-stage-lbl">BGV Stage 1</div>
+      <div class="bgv-stat-row">
+        <div class="bgv-stat" style="background:var(--greenlt)"><div class="sv" style="color:var(--green)">${s1.done}</div><div class="sl" style="color:var(--green)">Completed</div></div>
+        <div class="bgv-stat" style="background:var(--amberlt)"><div class="sv" style="color:var(--amber)">${s1.wip}</div><div class="sl" style="color:var(--amber)">WIP</div></div>
+        <div class="bgv-stat" style="background:#F1F5F9"><div class="sv" style="color:var(--slate)">${s1.open}</div><div class="sl" style="color:var(--slate)">Open</div></div>
+      </div>
+      <div class="bgv-stage-lbl">BGV Stage 2</div>
+      <div class="bgv-stat-row">
+        <div class="bgv-stat" style="background:var(--greenlt)"><div class="sv" style="color:var(--green)">${s2.done}</div><div class="sl" style="color:var(--green)">Completed</div></div>
+        <div class="bgv-stat" style="background:var(--amberlt)"><div class="sv" style="color:var(--amber)">${s2.wip}</div><div class="sl" style="color:var(--amber)">WIP</div></div>
+        <div class="bgv-stat" style="background:#F1F5F9"><div class="sv" style="color:var(--slate)">${s2.open}</div><div class="sl" style="color:var(--slate)">Open</div></div>
+      </div>
+    </div>`;
+  }
+  const p1=src.filter(r=>r.fs==='3.Onboarded');
+  const p2=src.filter(r=>r.fs==='2.Offer Accepted');
+  document.getElementById('bgv-sum').innerHTML=box(p1,'✅ Onboarded')+box(p2,'📋 Offer Accepted');
+}
+
+function renderBGVTable(tbId,rows){
+  let html='';
+  rows.forEach((r,i)=>{
+    html+=`<tr>
+      <td><strong>${r.res||'TBD'}</strong></td>
+      <td style="font-size:11.5px;max-width:170px">${r.role}</td>
+      <td style="font-size:11.5px">${r.hm||'—'}</td>
+      <td>${bgvB(r.b1)}</td>
+      <td>${bgvB(r.b2)}</td>
+    </tr>`;
+  });
+  document.getElementById(tbId).innerHTML=html;
+}
+
+function renderWIPTable(rows){
+  let html='';
+  rows.forEach(r=>{
+    html+=`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${r.req||'—'}</td>
+      <td style="font-size:11.5px;max-width:170px">${r.role}</td>
+      <td style="font-size:11.5px">${r.hm||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${(r.ej||'—').replace(' 00:00:00','')}</td>
+      <td>${bgvB(r.b1)}</td>
+      <td>${bgvB(r.b2)}</td>
+    </tr>`;
+  });
+  document.getElementById('bgv-p3').innerHTML=html;
+}
+
+function renderDeptActionItems(filtered){
+  const hmFilter=ACHMF!=='all'?ACHMF:null;
+  // Map HM → primary dept for filtering
+  const hmToDept={};
+  H.forEach(r=>{ if(r.hm&&r.coe) hmToDept[r.hm]=r.coe; });
+  const activeDept=hmFilter?hmToDept[hmFilter]:null;
+
+  // Pull action items from PROG_C1 where src==='action_items'
+  const aiRows=PROG_C1.filter(r=>r.src==='action_items');
+
+  // Dept grouping config
+  const DEPT_CFG=[
+    {key:'TA',         label:'Talent Acquisition', color:'var(--teal)',   icon:'🎯', coe:'Apps'},
+    {key:'L&D',        label:'L&D / Training',      color:'var(--purple)', icon:'📚', coe:'Data Analytics'},
+    {key:'IT',         label:'IT & Infrastructure', color:'var(--amber)',  icon:'💻', coe:'Cloudops'},
+    {key:'RMG',        label:'RMG / HR',             color:'#B45309',       icon:'👥', coe:'PMO'},
+    {key:'Program Management', label:'Program Management', color:'var(--navy)', icon:'📋', coe:'PMO'},
+  ];
+
+  const cards=DEPT_CFG
+    .filter(cfg=>!activeDept||(cfg.coe===activeDept||cfg.key==='Program Management'))
+    .map(cfg=>{
+      const rows=aiRows.filter(r=>r.r===cfg.key);
+      if(!rows.length) return '';
+      const itemsHtml=rows.map(r=>{
+        const sColor=r.s==='Done'?'var(--green)':r.s==='InProgress'?'var(--amber)':'var(--muted)';
+        const sIcon =r.s==='Done'?'✅':r.s==='InProgress'?'🔄':'⭕';
+        const etaStr=r.e?'<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);margin-left:6px">ETA '+r.e+'</span>':'';
+        return '<li style="list-style:none;padding:6px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:16px 1fr;gap:6px;align-items:start">'+
+          '<span style="color:'+sColor+';font-size:11px;margin-top:1px">'+sIcon+'</span>'+
+          '<div>'+
+            '<div style="font-size:12px;color:var(--text);font-weight:500">'+r.a+'</div>'+
+            '<div style="font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:8px">'+
+              (r.o?'<span>👤 '+r.o+'</span>':'')+'<span style="color:'+sColor+';font-weight:600">'+r.s+'</span>'+etaStr+
+            '</div>'+
+          '</div>'+
+        '</li>';
+      }).join('');
+      return '<div class="dept-act-card">'+
+        '<div class="dept-act-title" style="color:'+cfg.color+'">'+cfg.icon+' '+cfg.label+
+          ' <span style="font-size:9px;font-weight:400;color:var(--muted);">'+rows.length+' items</span></div>'+
+        '<ul style="margin:0;padding:0">'+itemsHtml+'</ul>'+
+      '</div>';
+    }).filter(Boolean).join('');
+
+  document.getElementById('dept-act-grid').innerHTML=
+    cards||'<div style="color:var(--muted);font-size:12px;padding:8px">No action items for current filter.</div>';
+}
+
+function renderHR(){
+  const d=filt();
+  renderBGVBoxes(d);
+  // Phase 1 – Onboarded
+  const p1Rows=d.filter(r=>r.fs==='3.Onboarded');
+  _p1Rows=p1Rows; HR_P1_FILTER='all';
+  renderBGVTable('bgv-p1',p1Rows);
+  // Phase 2 – Offer Accepted
+  const p2Rows=d.filter(r=>r.fs==='2.Offer Accepted');
+  _p2Rows=p2Rows; HR_P2_FILTER='all';
+  renderBGVTable('bgv-p2',p2Rows);
+  // Phase 3 – WIP
+  const p3Rows=d.filter(r=>r.fs==='1.WIP');
+  _p3Rows=p3Rows; WIP_COH_FILTER='all';
+  renderWIPTable(p3Rows);
+  // Update tab labels
+  document.querySelectorAll('#b-hr .tbtn')[0].textContent=`✅ Onboarded (${p1Rows.length})`;
+  document.querySelectorAll('#b-hr .tbtn')[1].textContent=`📋 Offer Accepted (${p2Rows.length})`;
+  document.querySelectorAll('#b-hr .tbtn')[2].textContent=`🔄 WIP (${p3Rows.length})`;
+
+  document.getElementById('hr-act-list').innerHTML=[
+    ['Resources Joined & Laptops Handed Over','InProgress','Dhaval R.'],
+    ['Onboarding & Overview Trainings – Week 1 (C1)','Done','Deb S.'],
+    ['Boot Camp (HR Overview, Compliance) – Week 2 & 3','InProgress','Deb S.'],
+    ['Define 30/60/90 Day Activities & Progression','InProgress','Amy E.'],
+    ['Introduce to Mentors','Open','Chintan M.'],
+    ['Technology Deep Dive – Week 4','Open','Chintan M.'],
+    ['Shadow Actual Project – Month 2','Open','Chintan M.'],
+    ['Transition to Hands-on Roles – Month 3','Open','Chintan M.'],
+    ['Track Performance of New Hires','Open','Chintan M.'],
+  ].map(([l,s,o])=>tli(l,s,o)).join('');
+  renderDeptActionItems(d);
+}
+
+// ═══════════════════ 5. PROGRAM ═══════════════════
+function renderProg(){
+  const done=PROG_C1.filter(r=>r.s==='Done').length;
+  const inp=PROG_C1.filter(r=>r.s==='InProgress').length;
+  const open=PROG_C1.filter(r=>r.s==='Open').length;
+  const total=PROG_C1.length;
+  const pct=Math.round(done/total*100);
+
+  document.getElementById('dpct').textContent=pct+'%';
+  document.getElementById('prog-frac').innerHTML=`${done} <span style="font-size:13px;font-weight:400;color:var(--muted)">of ${total}</span>`;
+  document.getElementById('prog-pills').innerHTML=`
+    <div class="sp" style="background:var(--greenlt)"><div class="n" style="color:var(--green);font-size:19px">${done}</div><div class="l" style="color:var(--green)">Done</div></div>
+    <div class="sp" style="background:var(--amberlt)"><div class="n" style="color:var(--amber);font-size:19px">${inp}</div><div class="l" style="color:var(--amber)">In Progress</div></div>
+    <div class="sp" style="background:#F1F5F9"><div class="n" style="color:var(--muted);font-size:19px">${open}</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+
+  const expBtn=document.getElementById('prog-expand-btn');
+  if(expBtn) expBtn.innerHTML='&#9657; Show Full Task Detail ('+total+' tasks)';
+
+  // Workstream bars
+  const WS=[
+    {l:'Preparation & Contracts', keys:['preparation','finalize offshore','local leadership','sign contract']},
+    {l:'IT Infrastructure',       keys:['infrastructure','security','identity','endpoint','network','application control','data protection','logging','user support','laptop','golden image','vdi','day-0']},
+    {l:'Talent Development',      keys:['talent development','training program','prepare training','acx overview','core work','technology deep','define mentor','identify us mentor','define 30','identify us cohort','build mentor']},
+    {l:'Talent Acquisition',      keys:['talent acquisition','define roles','conduct interview','establish success','jd mapping','jd discussion','interview panel','pipeline velocity']},
+    {l:'Onboarding & Ramp-up',    keys:['onboarding','resources joined','boot camp','introduce to mentor','shadow','transition to hands','track performance','operations & governance','raci','governance dashboard']},
+  ];
+  const colors=['var(--green)','var(--teal)','var(--purple)','var(--amber)','var(--indigo)'];
+  const wsStats=WS.map((w,i)=>{
+    const items=PROG_C1.filter(r=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
+    const d=items.filter(r=>r.s==='Done').length;
+    const t=items.length||1;
+    return{...w,d,t,c:colors[i]};
+  });
+  document.getElementById('prog-bars').innerHTML=wsStats.map(w=>`
+    <div class="pi">
+      <div class="pl">${w.l}</div>
+      <div class="pbw"><div class="pw"><div class="pf" style="width:${Math.round(w.d/w.t*100)}%;background:${w.c}"></div></div></div>
+      <div class="pc">${w.d}/${w.t}</div>
+    </div>`).join('');
+
+  // Key alerts — overdue items
+  const today=new Date().toISOString().slice(0,10);
+  const overdue=PROG_C1.filter(r=>r.s!=='Done'&&r.e&&r.e<today&&/^\d{4}/.test(r.e));
+  const alertEl=document.getElementById('prog-alerts');
+  if(overdue.length>0){
+    alertEl.innerHTML='<div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:9px 13px;margin-bottom:2px">'+
+      '<div style="font-size:10.5px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">&#9888;&#65039; Attention Required &mdash; '+overdue.length+' item'+(overdue.length>1?'s':'')+' past ETA</div>'+
+      overdue.slice(0,5).map(r=>'<div style="font-size:12px;color:#78350F;padding:3px 0;border-bottom:1px solid #FDE68A;display:flex;justify-content:space-between;align-items:center">'+
+        '<span>'+(r.a.length>70?r.a.slice(0,70)+'&hellip;':r.a)+'</span>'+
+        '<span style="font-family:\'DM Mono\',monospace;font-size:10.5px;color:#B45309;margin-left:12px;white-space:nowrap">'+r.e+' &middot; '+(r.o||r.r)+'</span>'+
+      '</div>').join('')+
+      (overdue.length>5?'<div style="font-size:10.5px;color:var(--muted);margin-top:5px">+'+(overdue.length-5)+' more &mdash; expand detail below</div>':'')+
+    '</div>';
+  } else { alertEl.innerHTML=''; }
+
+  // In-Progress spotlight
+  const inpItems=PROG_C1.filter(r=>r.s==='InProgress').slice(0,6);
+  const spotEl=document.getElementById('prog-spotlight');
+  if(inpItems.length>0){
+    spotEl.innerHTML='<div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">&#128260; Currently In Progress</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+      inpItems.map(r=>'<div style="background:#FFF8ED;border:1px solid #FDE68A;border-radius:7px;padding:7px 10px">'+
+        '<div style="font-size:12px;font-weight:500;color:var(--text)">'+(r.a.length>55?r.a.slice(0,55)+'&hellip;':r.a)+'</div>'+
+        '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+(r.o||'&mdash;')+' &middot; ETA '+(r.e||'&mdash;')+'</div>'+
+      '</div>').join('')+
+    '</div>';
+  } else { spotEl.innerHTML=''; }
+
+  // Full task detail table (collapsed)
+  document.getElementById('prog-tbody').innerHTML=PROG_C1.map(r=>'<tr>'+
+    '<td>'+r.a+'</td>'+
+    '<td style="font-size:11px">'+r.o+'</td>'+
+    '<td style="font-size:11px;color:var(--muted)">'+r.r+'</td>'+
+    '<td>'+sBadge(r.s)+'</td>'+
+    '<td style="font-family:\'DM Mono\',monospace;font-size:11px">'+(r.e&&!r.e.startsWith('=')?r.e:'&mdash;')+'</td>'+
+  '</tr>').join('');
+
+  setTimeout(()=>{const c=2*Math.PI*30;document.getElementById('darc').setAttribute('stroke-dasharray',(c*pct/100)+' '+(c*(1-pct/100)));},500);
+}
+
+function toggleProgDetail(){
+  const det=document.getElementById('prog-detail');
+  const btn=document.getElementById('prog-expand-btn');
+  if(det.style.display==='none'){
+    det.style.display='block';
+    btn.innerHTML='&#9663; Hide Task Detail';
+  } else {
+    det.style.display='none';
+    btn.innerHTML='&#9657; Show Full Task Detail ('+PROG_C1.length+' tasks)';
+  }
+}
+
+// ═══════════════════ MODAL ═══════════════════
+function openMod(c){
+  const order={'3.Onboarded':0,'2.Offer Accepted':1,'1.WIP':2};
+  const allRows=H.filter(r=>coh(r)===c).sort((a,b)=>(order[a.fs]||0)-(order[b.fs]||0));
+  document.getElementById('mtitle').textContent=`${CLBL[c]} — ${allRows.length} Positions`;
+  const filterBtns=`<div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap">
+    <button onclick="filterModal(this,${c},'all')" style="padding:3px 10px;border-radius:14px;border:1.5px solid var(--border);background:#fff;font-size:10.5px;font-weight:600;color:var(--muted);cursor:pointer">All (${allRows.length})</button>
+    <button onclick="filterModal(this,${c},'3.Onboarded')" style="padding:3px 10px;border-radius:14px;border:1.5px solid var(--green);background:var(--greenlt);font-size:10.5px;font-weight:600;color:var(--green);cursor:pointer">✅ Onboarded (${allRows.filter(r=>r.fs==='3.Onboarded').length})</button>
+    <button onclick="filterModal(this,${c},'2.Offer Accepted')" style="padding:3px 10px;border-radius:14px;border:1.5px solid var(--amber);background:var(--amberlt);font-size:10.5px;font-weight:600;color:var(--amber);cursor:pointer">📋 Offer Accepted (${allRows.filter(r=>r.fs==='2.Offer Accepted').length})</button>
+    <button onclick="filterModal(this,${c},'1.WIP')" style="padding:3px 10px;border-radius:14px;border:1.5px solid var(--indigo);background:var(--indigolt);font-size:10.5px;font-weight:600;color:var(--indigo);cursor:pointer">🔄 WIP (${allRows.filter(r=>r.fs==='1.WIP').length})</button>
+  </div>`;
+  document.getElementById('mbody').innerHTML=filterBtns+buildModTable(allRows);
+  document.getElementById('mover').style.display='block';
+  document.getElementById('modal').style.display='flex';
+}
+function filterModal(btn,c,fs){
+  const order={'3.Onboarded':0,'2.Offer Accepted':1,'1.WIP':2};
+  let rows=H.filter(r=>coh(r)===c).sort((a,b)=>(order[a.fs]||0)-(order[b.fs]||0));
+  if(fs!=='all') rows=rows.filter(r=>r.fs===fs);
+  const existing=document.querySelector('#mbody table');
+  const tmp=document.createElement('div');
+  tmp.innerHTML=buildModTable(rows);
+  if(existing) existing.replaceWith(tmp.firstElementChild);
+}
+function buildModTable(rows){
+  let html=`<table class="dt" style="width:100%"><thead><tr><th>#</th><th>Client Req ID</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Resource</th><th>DoJ / Expected</th><th>Status</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    html+=`<tr>
+      <td style="color:var(--muted)">${r.sno}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${r.req||'—'}</td>
+      <td>${r.role}</td>
+      <td style="font-size:11.5px">${r.hm||'—'}</td>
+      <td>${r.res||'<span style="color:var(--muted)">TBD</span>'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${(r.doj||r.ej||'—').replace(' 00:00:00','')}</td>
+      <td>${fsBadge(r.fs)}</td>
+    </tr>`;
+  });
+  html+=`</tbody></table>`;
+  return html;
+}
+function closeMod(){document.getElementById('mover').style.display='none';document.getElementById('modal').style.display='none';}
+
+// ═══════════════════ FILTER ═══════════════════
+function setF(v,btn){
+  ACF=v;
+  // Remove 'on' only from sibling buttons in same fbar
+  btn.closest('.fbar').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderStrip();renderHiring();renderHR();
+}
+function setHMF(v,btn){
+  ACHMF=v;
+  document.querySelectorAll('#hm-fbar .fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderStrip();renderHiring();renderHR();
+}
+
+// ═══════════════════ COLLAPSE ═══════════════════
+const CS={hiring:true,ld:true,it:true,hr:true,prog:true};
+function tog(id){
+  CS[id]=!CS[id];
+  document.getElementById('b-'+id).style.display=CS[id]?'block':'none';
+  document.getElementById('c-'+id).querySelector('.card-hdr').classList.toggle('coll',!CS[id]);
+}
+
+// ═══════════════════ TABS ═══════════════════
+function swt(sec,tab,btn){
+  document.querySelectorAll(`#b-${sec} .tbtn`).forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll(`#b-${sec} .tpanel`).forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(`${sec}-${tab}`).classList.add('on');
+}
+
+// ═══════════════════ PROGRAM TAB FILTER ═══════════════════
+function setProgTabFilter(val,btn){
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  let items=val==='all'?PROG_C1:PROG_C1.filter(r=>r.s===val);
+  document.getElementById('prog-tbody').innerHTML=items.map(r=>`<tr>
+    <td>${r.a}</td>
+    <td style="font-size:11px">${r.o}</td>
+    <td style="font-size:11px;color:var(--muted)">${r.r}</td>
+    <td>${sBadge(r.s)}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px">${r.e&&!r.e.startsWith('=')?r.e:'—'}</td>
+  </tr>`).join('');
+}
+
+// ═══════════════════ LD & IT TAB FILTERS ═══════════════════
+let LD_TAB_FILTER='all', IT_TAB_FILTER='all';
+let _ldSetup=[], _ldC1=[], _ldC2=[], _itItems={};
+
+function setLDTabFilter(val,btn){
+  LD_TAB_FILTER=val;
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const applyFilter=(arr)=>val==='all'?arr:arr.filter(i=>i[1]===val);
+  document.getElementById('ld-setup-list').innerHTML=applyFilter(_ldSetup).map(([l,s,o])=>tli(l,s,o)).join('');
+  document.getElementById('ld-c1-list').innerHTML=applyFilter(_ldC1).map(([l,s,o])=>tli(l,s,o)).join('');
+  document.getElementById('ld-c2-list').innerHTML=applyFilter(_ldC2).map(([l,s,o])=>tli(l,s,o)).join('');
+}
+function setITTabFilter(val,btn){
+  IT_TAB_FILTER=val;
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const applyFilter=(arr)=>val==='all'?arr:arr.filter(i=>i[1]===val);
+  Object.entries(_itItems).forEach(([id,arr])=>{
+    document.getElementById(id).innerHTML=applyFilter(arr).map(([l,s,o])=>tli(l,s,o)).join('');
+  });
+}
+
+// ═══════════════════ HR TAB FILTERS ═══════════════════
+let HR_P1_FILTER='all', HR_P2_FILTER='all', WIP_COH_FILTER='all';
+let _p1Rows=[], _p2Rows=[], _p3Rows=[];
+
+function filterHRTab(tab,filter,btn){
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(tab==='p1'){
+    HR_P1_FILTER=filter;
+    let rows=_p1Rows;
+    if(filter==='bgv1done') rows=rows.filter(r=>normB(r.b1)==='done');
+    else if(filter==='bgv1wip') rows=rows.filter(r=>normB(r.b1)==='wip');
+    else if(filter==='bgv1open') rows=rows.filter(r=>normB(r.b1)==='open');
+    renderBGVTable('bgv-p1',rows);
+  } else {
+    HR_P2_FILTER=filter;
+    let rows=_p2Rows;
+    if(filter==='bgv1done') rows=rows.filter(r=>normB(r.b1)==='done');
+    else if(filter==='bgv1wip') rows=rows.filter(r=>normB(r.b1)==='wip');
+    else if(filter==='bgv1open') rows=rows.filter(r=>normB(r.b1)==='open');
+    renderBGVTable('bgv-p2',rows);
+  }
+}
+function filterWIPTab(cohortFilter,btn){
+  WIP_COH_FILTER=cohortFilter;
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  let rows=_p3Rows;
+  if(cohortFilter!=='all') rows=rows.filter(r=>coh(r)===cohortFilter);
+  renderWIPTable(rows);
+}
+
+// ═══════════════════ KPI DRILL FUNCTIONS ═══════════════════
+let DRILL_HF={hiring:'all',bgv:'all'};
+let DRILL_LDF='all', DRILL_ITF='all', DRILL_PROGF='all';
+
+const LD_ALL_ITEMS=[
+  ['Training Program Outline & Success Criteria','Done','Abhishek S.'],
+  ['ACX Overview, Culture & Ways of Working','Done','Deb S.'],
+  ['Security & Compliance Training','Done','Deb S.'],
+  ['Core Work Fundamentals (SDLC, Cloud, Data)','Done','Deb S.'],
+  ['Technology Deep Dive by Work Area','Done','Deb S.'],
+  ['Talent Development Set Up','Done','Abhishek S.'],
+  ['Onboarding & Overview Trainings – Week 1','Done','Deb S.'],
+  ['Prepare Training Materials','InProgress','Deb S.'],
+  ['Define 30/60/90 Day Onboarding Plan','InProgress','Amy E.'],
+  ['Identify US Cohorts & Build Mentor Roster','InProgress','Amy E.'],
+  ['Boot Camp (HR, Compliance, Fundamentals) – Wk 2 & 3','InProgress','Deb S.'],
+  ['Onboarding & Overview Trainings – Week 1 (C2)','InProgress','Deb S.'],
+  ['Define Mentoring Program & Tracking','Open','Amy E.'],
+  ['Identify US Mentors','Open','Amy E.'],
+  ['Introduce to Mentors','Open','Chintan M.'],
+  ['Technology Deep Dive – Week 4','Open','Chintan M.'],
+  ['Shadow Actual Project – Month 2','Open','Chintan M.'],
+  ['Transition to Hands-on Roles – Month 3','Open','Chintan M.'],
+  ['Track Performance of New Hires','Open','Chintan M.'],
+  ['Boot Camp – Week 2 & 3 (C2)','Open','Deb S.'],
+  ['Introduce to Mentors (C2)','Open','Chintan M.'],
+  ['Technology Deep Dive – Week 4 (C2)','Open','Chintan M.'],
+];
+
+const IT_ALL_ITEMS=[
+  ['Infrastructure & Setup (overall)','InProgress','Amij P.'],
+  ['Design Security & Privacy Controls','InProgress','Dhaval R.'],
+  ['Identity & Access Controls (AD, MFA, RBAC)','InProgress','Dhaval R.'],
+  ['Data Protection, DLP, PII/PCI/PHI Rules','InProgress','Amij P.'],
+  ['Logging, Monitoring & Compliance','InProgress','Dhaval R.'],
+  ['Endpoint Protection (EDR, SecOps, Runbook)','InProgress','Dhaval R.'],
+  ['Network & Connectivity Controls (VPN)','InProgress','Dhaval R.'],
+  ['Application Control & Software Governance','InProgress','Amij P.'],
+  ['Laptop Readiness & Distribution','InProgress','Dhaval R.'],
+  ['Golden Image Setup (Security Tools, VPN, VDI)','InProgress','Dhaval R.'],
+  ['VDI Environment Setup','InProgress','Amij P.'],
+  ['Laptop Procurement & Setup','InProgress','Dhaval R.'],
+  ['User Support Foundation Setup','InProgress','Dhaval R.'],
+  ['Remote Support Model Setup','InProgress','Dhaval R.'],
+  ['Day-0 Checklist','Done','Dhaval R.'],
+];
+
+function openDrill(key){
+  // Close all drills first
+  document.querySelectorAll('.kpi-drill').forEach(d=>d.classList.remove('on'));
+  document.getElementById('drill-'+key).classList.add('on');
+  renderDrill(key);
+  document.getElementById('drill-'+key).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeDrill(key){
+  document.getElementById('drill-'+key).classList.remove('on');
+}
+
+function setDrillFilter(key,val,btn){
+  DRILL_HF[key]=val;
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderDrill(key);
+}
+function setLDFilter(val,btn){
+  DRILL_LDF=val;
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderDrill('ld');
+}
+function setITFilter(val,btn){
+  DRILL_ITF=val;
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderDrill('it');
+}
+function setProgFilter(val,btn){
+  DRILL_PROGF=val;
+  btn.closest('.kpi-sf').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderDrill('prog');
+}
+
+function renderDrill(key){
+  if(key==='hiring'||key==='bgv'){
+    const hf=DRILL_HF[key];
+    let rows=filt();
+    // Sort: Onboarded first, then Offer Accepted, then WIP
+    const order={'3.Onboarded':0,'2.Offer Accepted':1,'1.WIP':2};
+    if(hf!=='all') rows=rows.filter(r=>r.fs===hf);
+    else rows=[...rows].sort((a,b)=>(order[a.fs]||0)-(order[b.fs]||0));
+    const bodyEl=document.getElementById('drill-'+key+'-body');
+    let html=`<table class="dt" style="width:100%"><thead><tr>
+      <th>Client Req ID</th><th>Resource</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Status</th><th>Exp. Join</th>`;
+    if(key==='bgv') html+=`<th>BGV Stg 1</th><th>BGV Stg 2</th>`;
+    html+=`</tr></thead><tbody>`;
+    rows.forEach(r=>{
+      html+=`<tr>
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${r.req||'—'}</td>
+        <td><strong>${r.res||'<span style="color:var(--muted)">TBD</span>'}</strong></td>
+        <td style="font-size:11.5px">${r.role}</td>
+        <td style="font-size:11.5px">${r.hm||'—'}</td>
+        <td>${fsBadge(r.fs)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${(r.doj||r.ej||'—').replace(' 00:00:00','')}</td>`;
+      if(key==='bgv') html+=`<td>${bgvB(r.b1)}</td><td>${bgvB(r.b2)}</td>`;
+      html+=`</tr>`;
+    });
+    html+=`</tbody></table>`;
+    bodyEl.innerHTML=html;
+  } else if(key==='ld'){
+    let items=LD_ALL_ITEMS;
+    if(DRILL_LDF!=='all') items=items.filter(i=>i[1]===DRILL_LDF);
+    document.getElementById('drill-ld-body').innerHTML=`<ul class="tl">${items.map(([l,s,o])=>tli(l,s,o)).join('')}</ul>`;
+  } else if(key==='it'){
+    let items=IT_ALL_ITEMS;
+    if(DRILL_ITF!=='all') items=items.filter(i=>i[1]===DRILL_ITF);
+    document.getElementById('drill-it-body').innerHTML=`<ul class="tl">${items.map(([l,s,o])=>tli(l,s,o)).join('')}</ul>`;
+  } else if(key==='prog'){
+    let items=PROG_C1;
+    if(DRILL_PROGF!=='all') items=items.filter(r=>r.s===DRILL_PROGF);
+    document.getElementById('drill-prog-body').innerHTML=`<table class="dt" style="width:100%"><thead><tr>
+      <th>Activity</th><th>Owner</th><th>Responsible</th><th>Status</th><th>ETA</th></tr></thead><tbody>
+      ${items.map(r=>`<tr>
+        <td>${r.a}</td>
+        <td style="font-size:11px">${r.o}</td>
+        <td style="font-size:11px;color:var(--muted)">${r.r}</td>
+        <td>${sBadge(r.s)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${r.e&&!r.e.startsWith('=')?r.e:'—'}</td>
+      </tr>`).join('')}
+      </tbody></table>`;
+  }
+}
+
+// ═══════════════════ INIT ═══════════════════
+// ── Populate Hiring Manager filter bar dynamically ───────────────────────
+(function(){
+  const bar=document.getElementById('hm-fbar');
+  const counts={};
+  H.forEach(r=>{ if(r.hm&&r.hm.trim()){ counts[r.hm]=(counts[r.hm]||0)+1; }});
+  Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([hm,cnt])=>{
+    const btn=document.createElement('button');
+    btn.className='fbtn';
+    btn.innerHTML=hm+' <span style="font-size:9.5px;opacity:.65">('+cnt+')</span>';
+    btn.onclick=function(){ setHMF(hm,this); };
+    bar.appendChild(btn);
+  });
+})();
+
+renderStrip();renderHiring();renderLD();renderIT();renderHR();renderProg();
+
+
+// ═══════════════════ SHAREPOINT LIVE DATA (MSAL + Graph) ═════════════════
+
+const SP_FILE_ITEM_ID = '0087E802-4616-4503-B453-7AD57E5F496A';
+const SP_SITE_HOST    = 'anblicks.sharepoint.com';
+const SP_SITE_PATH    = '/sites/acxiom_gcc';
+const GRAPH_SCOPE     = ['https://graph.microsoft.com/Files.Read.All'];
+
+let _msalInstance = null;
+let _spAccount    = null;
+
+function spGetCfg(){
+  return {
+    clientId: localStorage.getItem('sp_client_id')||'',
+    tenantId: localStorage.getItem('sp_tenant_id')||''
+  };
+}
+
+function spConfigOpen(){
+  const cfg=spGetCfg();
+  document.getElementById('cfg-client-id').value=cfg.clientId;
+  document.getElementById('cfg-tenant-id').value=cfg.tenantId;
+  // Show computed redirect URI
+  const saved=localStorage.getItem('sp_redirect_uri')||'';
+  const auto=(window.location.protocol==='file:')?'http://localhost':(window.location.origin+window.location.pathname);
+  document.getElementById('cfg-redirect-display').textContent=saved||auto;
+  document.getElementById('cfg-redirect-uri').value=saved;
+  document.getElementById('sp-cfg-overlay').style.display='block';
+  document.getElementById('sp-cfg-modal').style.display='block';
+}
+function spConfigClose(){
+  document.getElementById('sp-cfg-overlay').style.display='none';
+  document.getElementById('sp-cfg-modal').style.display='none';
+}
+function spConfigSave(){
+  const cid=document.getElementById('cfg-client-id').value.trim();
+  const tid=document.getElementById('cfg-tenant-id').value.trim();
+  const ruri=document.getElementById('cfg-redirect-uri').value.trim();
+  if(!cid||!tid){ alert('Please enter both Client ID and Tenant ID.'); return; }
+  localStorage.setItem('sp_client_id',cid);
+  localStorage.setItem('sp_tenant_id',tid);
+  if(ruri) localStorage.setItem('sp_redirect_uri',ruri);
+  else localStorage.removeItem('sp_redirect_uri');
+  _msalInstance=null; // reset so next connect re-initialises
+  spConfigClose();
+  spConnect();
+}
+function spConfigClear(){
+  localStorage.removeItem('sp_client_id');
+  localStorage.removeItem('sp_tenant_id');
+  localStorage.removeItem('sp_redirect_uri');
+  _msalInstance=null; _spAccount=null;
+  spSetStatus('⚡ Not connected','rgba(255,255,255,.55)');
+  spConfigClose();
+}
+
+function spSetStatus(msg,color){
+  const el=document.getElementById('sp-status-chip');
+  if(el){ el.textContent=msg; el.style.color=color||'rgba(255,255,255,.55)'; }
+}
+
+function spInitMsal(){
+  const cfg=spGetCfg();
+  if(!cfg.clientId||!cfg.tenantId) return null;
+  if(_msalInstance) return _msalInstance;
+  // Determine a stable redirect URI
+  // For popup flow, MSAL redirects back to this page — must be registered in Azure AD
+  let _redirectUri = localStorage.getItem('sp_redirect_uri')||'';
+  if(!_redirectUri){
+    const loc = window.location;
+    if(loc.protocol === 'file:'){
+      // file:// won't work with AAD — user needs to serve via localhost or register file URI
+      _redirectUri = 'http://localhost';
+    } else {
+      _redirectUri = loc.origin + loc.pathname;
+    }
+  }
+  _msalInstance = new msal.PublicClientApplication({
+    auth:{
+      clientId: cfg.clientId,
+      authority: 'https://login.microsoftonline.com/'+cfg.tenantId,
+      redirectUri: _redirectUri
+    },
+    cache:{ cacheLocation:'localStorage', storeAuthStateInCookie:true }
+  });
+  return _msalInstance;
+}
+
+async function spConnect(){
+  const btn=document.getElementById('sp-connect-btn');
+  const cfg=spGetCfg();
+  if(!cfg.clientId||!cfg.tenantId){
+    spConfigOpen();
+    return;
+  }
+  try{
+    if(btn){ btn.textContent='Connecting…'; btn.disabled=true; }
+    spSetStatus('⏳ Connecting…','#FCD34D');
+    const msalApp=spInitMsal();
+    if(!msalApp){ spConfigOpen(); return; }
+
+    // Try silent first
+    let tokenRes=null;
+    const accounts=msalApp.getAllAccounts();
+    if(accounts.length>0){
+      try{
+        tokenRes=await msalApp.acquireTokenSilent({scopes:GRAPH_SCOPE,account:accounts[0]});
+      }catch(e){ tokenRes=null; }
+    }
+    if(!tokenRes){
+      // loginPopup handles both sign-in + consent in one popup
+      tokenRes=await msalApp.loginPopup({scopes:GRAPH_SCOPE, prompt:'select_account'});
+      // After login, get actual access token
+      tokenRes=await msalApp.acquireTokenSilent({scopes:GRAPH_SCOPE, account:msalApp.getAllAccounts()[0]});
+    }
+    _spAccount=tokenRes.account;
+    spSetStatus('✅ '+_spAccount.username,'#6EE7B7');
+    if(btn){ btn.textContent='↻ Refresh'; btn.disabled=false; }
+
+    await spFetchAndLoad(tokenRes.accessToken);
+  }catch(e){
+    console.error('SP connect error',e);
+    spSetStatus('❌ Auth failed','#FCA5A5');
+    if(btn){ btn.textContent='🔗 Connect'; btn.disabled=false; }
+  }
+}
+
+async function spFetchAndLoad(token){
+  try{
+    spSetStatus('⬇ Loading Excel…','#FCD34D');
+    // Get site id
+    const siteRes=await fetch(
+      'https://graph.microsoft.com/v1.0/sites/'+SP_SITE_HOST+':'+SP_SITE_PATH,
+      {headers:{Authorization:'Bearer '+token}}
+    );
+    const site=await siteRes.json();
+    if(!site.id) throw new Error('Could not resolve site: '+JSON.stringify(site));
+
+    // Download file content
+    const fileUrl='https://graph.microsoft.com/v1.0/sites/'+site.id+'/drive/items/'+SP_FILE_ITEM_ID+'/content';
+    const fileRes=await fetch(fileUrl,{headers:{Authorization:'Bearer '+token}});
+    if(!fileRes.ok) throw new Error('File fetch failed: '+fileRes.status);
+
+    const buf=await fileRes.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array',cellDates:true});
+    spProcessWorkbook(wb);
+    spSetStatus('✅ Live data – '+new Date().toLocaleTimeString(),'#6EE7B7');
+    document.getElementById('dt-badge').textContent=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  }catch(e){
+    console.error('SP fetch error',e);
+    spSetStatus('❌ Load failed: '+e.message.slice(0,40),'#FCA5A5');
+  }
+}
+
+// ── Parse workbook → update H and PROG_C1 ─────────────────────────────────
+function spCell(r,idx){
+  const v=r[idx];
+  if(v===null||v===undefined) return '';
+  if(v instanceof Date){ const y=v.getFullYear(),m=String(v.getMonth()+1).padStart(2,'0'),d=String(v.getDate()).padStart(2,'0'); return y+'-'+m+'-'+d; }
+  return String(v).trim().replace(/\u00a0/g,'').replace(/\n/g,' ');
+}
+function spNormFS(v){
+  const s=spCell([v],0).toLowerCase();
+  if(s.includes('3')||s.includes('onboard')) return '3.Onboarded';
+  if(s.includes('2')||s.includes('offer')||s.includes('accept')) return '2.Offer Accepted';
+  return '1.WIP';
+}
+function spNormStatus(v){
+  if(v===null||v===undefined||v==='') return 'Open';
+  if(typeof v==='number'||typeof v==='float'){
+    if(v>=0.9) return 'Done'; if(v>0) return 'InProgress'; return 'Open';
+  }
+  const s=String(v).toLowerCase().trim();
+  if(s.includes('done')||s.includes('complet')||s.includes('closed')) return 'Done';
+  if(s.includes('progress')||s.includes('wip')||s.includes('ongoing')) return 'InProgress';
+  return 'Open';
+}
+
+function spProcessWorkbook(wb){
+  const newH=[], newProg=[];
+  let sno=1;
+
+  // ── Hiring_Tracker ───────────────────────────────────────────────────
+  if(wb.SheetNames.includes('Hiring_Tracker')){
+    const sheet=wb.Sheets['Hiring_Tracker'];
+    const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:false});
+    for(let i=1;i<rows.length;i++){
+      const r=rows[i];
+      if(!r[0]) continue;
+      const name=spCell(r,10), fs_raw=spCell(r,15);
+      const fs=(!name.trim())?'1.WIP':spNormFS(fs_raw);
+      newH.push({
+        sno:sno++,
+        req:spCell(r,1), role:spCell(r,2), exp:spCell(r,3), coe:spCell(r,4),
+        hm:spCell(r,8),  ej:spCell(r,9),   res:name,
+        doj:spCell(r,11),loc:spCell(r,12), status:spCell(r,13), fs:fs,
+        b1:spCell(r,19), b2:spCell(r,20),  it:spCell(r,23),
+        grade:spCell(r,22), minexp:spCell(r,3), client_req:spCell(r,24)
+      });
+    }
+  }
+
+  // ── Comprehensive Plan ───────────────────────────────────────────────
+  if(wb.SheetNames.includes('Comprehensive Plan')){
+    const sheet=wb.Sheets['Comprehensive Plan'];
+    const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:false});
+    for(let i=2;i<rows.length;i++){   // skip header row + date row
+      const r=rows[i];
+      if(!r[0]) continue;
+      newProg.push({
+        a:spCell(r,0), o:spCell(r,1), r:spCell(r,2),
+        s:spNormStatus(r[3]),          e:spCell(r,4),
+        src:'plan'
+      });
+    }
+  }
+
+  // ── Action_Items ────────────────────────────────────────────────────
+  if(wb.SheetNames.includes('Action_Items')){
+    const sheet=wb.Sheets['Action_Items'];
+    const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:false});
+    for(let i=1;i<rows.length;i++){
+      const r=rows[i];
+      if(!r[0]) continue;
+      newProg.push({
+        a:spCell(r,3), o:spCell(r,4), r:spCell(r,1),
+        s:spNormStatus(r[7]),          e:spCell(r,6),
+        src:'action_items',            area:spCell(r,2),
+        pri:spCell(r,5)
+      });
+    }
+  }
+
+  // Update global arrays
+  H.length=0;       newH.forEach(x=>H.push(x));
+  PROG_C1.length=0; newProg.forEach(x=>PROG_C1.push(x));
+
+  // Re-render everything
+  renderStrip(); renderHiring(); renderLD(); renderIT(); renderHR(); renderProg();
+  document.getElementById('dt-badge').textContent=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  // Repopulate HM filter bar
+  const bar=document.getElementById('hm-fbar');
+  Array.from(bar.querySelectorAll('.fbtn:not(#hmf-all)')).forEach(b=>b.remove());
+  const counts={};
+  H.forEach(r=>{ if(r.hm&&r.hm.trim()) counts[r.hm]=(counts[r.hm]||0)+1; });
+  Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([hm,cnt])=>{
+    const btn=document.createElement('button');
+    btn.className='fbtn';
+    btn.innerHTML=hm+' <span style="font-size:9.5px;opacity:.65">('+cnt+')</span>';
+    btn.onclick=function(){ setHMF(hm,this); };
+    bar.appendChild(btn);
+  });
+}
+
+// Auto-attempt silent sign-in on load if credentials exist
+(function(){
+  const cfg=spGetCfg();
+  if(cfg.clientId&&cfg.tenantId){
+    const msalApp=spInitMsal();
+    if(msalApp){
+      msalApp.handleRedirectPromise().then(()=>{
+        const accounts=msalApp.getAllAccounts();
+        if(accounts.length>0){
+          msalApp.acquireTokenSilent({scopes:GRAPH_SCOPE,account:accounts[0]})
+            .then(res=>{ _spAccount=res.account; spSetStatus('✅ '+res.account.username,'#6EE7B7'); document.getElementById('sp-connect-btn').textContent='↻ Refresh'; spFetchAndLoad(res.accessToken); })
+            .catch(()=>{ spSetStatus('Click Connect to sign in','rgba(255,255,255,.55)'); });
+        }
+      }).catch(()=>{});
+    }
+  }
+})();
+
+</script>
+
+<!-- ══ SharePoint Config Modal ══ -->
+<div id="sp-cfg-overlay" onclick="spConfigClose()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000"></div>
+<div id="sp-cfg-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:14px;padding:28px 32px;width:460px;max-width:95vw;z-index:1001;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div style="font-size:16px;font-weight:700;color:#0D1B3E">⚙ SharePoint Connection</div>
+    <button onclick="spConfigClose()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#6B7A99;width:28px;height:28px;border-radius:5px;display:grid;place-items:center">✕</button>
+  </div>
+  <div style="font-size:12px;color:#6B7A99;margin-bottom:16px">Enter your Azure App Registration credentials. These are saved in your browser only.</div>
+  <div style="display:grid;gap:14px">
+    <div>
+      <label style="font-size:11px;font-weight:600;color:#1A2438;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">Client ID (Application ID)</label>
+      <input id="cfg-client-id" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        style="width:100%;padding:9px 12px;border:1.5px solid #DDE5EE;border-radius:8px;font-size:12.5px;font-family:'DM Mono',monospace;outline:none"
+        onfocus="this.style.borderColor='#0A7E8C'" onblur="this.style.borderColor='#DDE5EE'">
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:600;color:#1A2438;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">Tenant ID (Directory ID)</label>
+      <input id="cfg-tenant-id" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        style="width:100%;padding:9px 12px;border:1.5px solid #DDE5EE;border-radius:8px;font-size:12.5px;font-family:'DM Mono',monospace;outline:none"
+        onfocus="this.style.borderColor='#0A7E8C'" onblur="this.style.borderColor='#DDE5EE'">
+    </div>
+    <div style="background:#EEF2F8;border-radius:8px;padding:10px 13px">
+      <div style="font-size:10.5px;font-weight:600;color:#0D1B3E;margin-bottom:3px">SharePoint File</div>
+      <div style="font-size:10.5px;color:#6B7A99;font-family:'DM Mono',monospace;word-break:break-all">ACX_RC_Executive_Summary.xlsx<br>Site: anblicks.sharepoint.com/sites/acxiom_gcc</div>
+    </div>
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 13px">
+      <div style="font-size:10.5px;font-weight:700;color:#1E40AF;margin-bottom:5px">⚠️ Azure App Registration — Redirect URI</div>
+      <div style="font-size:10.5px;color:#3730A3;margin-bottom:6px">Register this exact URI under <strong>Authentication → Single-page application</strong> in your Azure App Registration:</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <code id="cfg-redirect-display" style="font-size:10.5px;background:#fff;border:1px solid #BFDBFE;border-radius:5px;padding:4px 8px;flex:1;word-break:break-all;color:#1E3A8A;font-family:'DM Mono',monospace"></code>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('cfg-redirect-display').textContent)" style="padding:4px 9px;border-radius:5px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1E40AF;font-size:10.5px;cursor:pointer;white-space:nowrap">Copy</button>
+      </div>
+      <div style="margin-top:6px">
+        <label style="font-size:10.5px;color:#374151;display:block;margin-bottom:3px">Override redirect URI (optional):</label>
+        <input id="cfg-redirect-uri" type="text" placeholder="Leave blank to auto-detect"
+          style="width:100%;padding:6px 10px;border:1.5px solid #DDE5EE;border-radius:6px;font-size:11px;font-family:'DM Mono',monospace;outline:none"
+          onfocus="this.style.borderColor='#0A7E8C'" onblur="this.style.borderColor='#DDE5EE'">
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px">
+    <button onclick="spConfigSave()" style="flex:1;padding:10px;border-radius:8px;background:#0D1B3E;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Save &amp; Connect</button>
+    <button onclick="spConfigClear()" style="padding:10px 16px;border-radius:8px;background:#FEE2E2;color:#DC2626;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Clear</button>
+  </div>
+</div>
+
+</body>
+</html>
