@@ -329,11 +329,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="sleg" id="h-sleg"></div>
       <table class="ct"><thead><tr><th>Cohort</th><th>Onboarded</th><th>Offer Accepted</th><th>WIP</th><th>Total</th><th>Progress</th></tr></thead>
       <tbody id="h-tbody"></tbody></table>
-      <!-- Grade Pyramid -->
+      <!-- Experience Pyramid -->
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
         <div style="display:flex;align-items:center;margin-bottom:10px">
-          <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Experience (Min. Exp.)</div>
-          <button class="pyr-expand-btn" id="pyr-exp-btn" onclick="togglePyrExp()">▸ Min. Exp. Detail</button>
+          <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Experience Pyramid</div>
+          <button class="pyr-expand-btn" id="pyr-exp-btn" onclick="togglePyrExp()">▸ Band Detail</button>
         </div>
         <div class="pyramid-wrap" id="pyramid-wrap">
           <div class="pyramid-svg-wrap"><svg id="pyr-svg" width="220" height="200" viewBox="0 0 220 200"></svg></div>
@@ -341,7 +341,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
         <div class="pyr-exp-panel" id="pyr-exp-panel">
           <table class="pyr-exp-table">
-            <thead><tr><th>Experience Band</th><th>Count</th><th>Min. Exp.</th><th>Typical Roles</th></tr></thead>
+            <thead><tr><th>Band</th><th>Count</th><th>Experience Range</th><th>Typical Roles</th></tr></thead>
             <tbody id="pyr-exp-tbody"></tbody>
           </table>
         </div>
@@ -434,7 +434,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div id="hr-p3" class="tpanel">
         <div class="onb-phase-hdr" style="background:var(--indigolt);color:var(--indigo)">🔄 WIP — In Process</div>
-        <table class="dt"><thead><tr><th>Client Req ID</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Expected Join</th><th>BGV Stg 1</th><th>BGV Stg 2</th></tr></thead>
+        <table class="dt"><thead><tr><th>Client Req ID</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Exp. Onboarding</th><th>BGV Stg 1</th><th>BGV Stg 2</th></tr></thead>
         <tbody id="bgv-p3"></tbody></table>
       </div>
       <div id="hr-act" class="tpanel">
@@ -658,15 +658,15 @@ function renderHiring(){
 
 // ═══════════════════ PYRAMID ═══════════════════
 function renderPyramid(d){
-  // Grade bands L1-L3=Junior, L4-L5=Mid, L6-L7=Senior, L8+=Leadership
-  const graded=d.filter(r=>r.grade&&r.grade.match(/^L\d+$/));
+  // Experience bands based on minexp (years) field
+  const withExp=d.filter(r=>r.minexp&&!isNaN(parseInt(r.minexp)));
   const bands=[
-    {lbl:'Leadership (L8+)', grades:['L8','L9','L10'], col:'#0D1B3E'},
-    {lbl:'Senior (L6–L7)',   grades:['L6','L7'],       col:'#0A7E8C'},
-    {lbl:'Mid-Level (L4–L5)',grades:['L4','L5'],       col:'#4338CA'},
-    {lbl:'Junior (L1–L3)',   grades:['L1','L2','L3'],  col:'#16A34A'},
+    {lbl:'Lead / Expert',    range:'10+ yrs',  test:e=>e>=10, col:'#0D1B3E'},
+    {lbl:'Senior',           range:'8–9 yrs',  test:e=>e>=8&&e<10, col:'#0A7E8C'},
+    {lbl:'Mid-Level',        range:'5–7 yrs',  test:e=>e>=5&&e<8,  col:'#4338CA'},
+    {lbl:'Associate',        range:'3–4 yrs',  test:e=>e>=3&&e<5,  col:'#16A34A'},
   ];
-  bands.forEach(b=>{ b.cnt=graded.filter(r=>b.grades.includes(r.grade)).length; });
+  bands.forEach(b=>{ b.cnt=withExp.filter(r=>b.test(parseInt(r.minexp))).length; });
   const total=bands.reduce((s,b)=>s+b.cnt,0)||1;
 
   const svgW=220, svgH=200, pad=10;
@@ -676,8 +676,7 @@ function renderPyramid(d){
   let y=pad;
   const segH=usableH/bands.length;
   bands.forEach((b,i)=>{
-    const frac=(total>0?b.cnt/total:0);
-    const w=Math.max(30, maxW*(0.25+(i*0.25))); // pyramid: leadership narrow at top
+    const w=Math.max(30, maxW*(0.25+(i*0.25))); // pyramid: lead narrow at top
     const x=(svgW-w)/2;
     const rx=6;
     svgParts+=`<rect x="${x}" y="${y}" width="${w}" height="${segH-3}" rx="${rx}" fill="${b.col}" opacity="${0.85+i*0.04}"/>`;
@@ -690,23 +689,23 @@ function renderPyramid(d){
     const pct=total>0?Math.round(b.cnt/total*100):0;
     return`<div class="pyr-leg-row">
       <div class="pyr-leg-dot" style="background:${b.col}"></div>
-      <div class="pyr-leg-lbl">${b.lbl}</div>
+      <div class="pyr-leg-lbl">${b.lbl} <span style="font-size:9.5px;color:var(--muted)">(${b.range})</span></div>
       <div class="pyr-leg-cnt">${b.cnt}</div>
       <div class="pyr-leg-pct">&nbsp;(${pct}%)</div>
     </div>`;
   }).join('');
 
-  // Populate min experience table
+  // Populate experience detail table
   const expData=[
-    {band:'Leadership (L8+)',  cnt:bands[0].cnt, minExp:'12+ years', roles:'Manager, Director, Principal'},
-    {band:'Senior (L6–L7)',    cnt:bands[1].cnt, minExp:'7–11 years', roles:'Sr. Team Lead, Staff Engineer'},
-    {band:'Mid-Level (L4–L5)', cnt:bands[2].cnt, minExp:'3–6 years', roles:'Senior Engineer, Tech Lead'},
-    {band:'Junior (L1–L3)',    cnt:bands[3].cnt, minExp:'0–2 years', roles:'Engineer, Analyst, Associate'},
+    {band:'Lead / Expert',  range:'10+ yrs',  cnt:bands[0].cnt, roles:'Engineering Manager, Director, Principal'},
+    {band:'Senior',         range:'8–9 yrs',  cnt:bands[1].cnt, roles:'Senior Team Lead, Staff Engineer'},
+    {band:'Mid-Level',      range:'5–7 yrs',  cnt:bands[2].cnt, roles:'Senior Engineer, Tech Lead'},
+    {band:'Associate',      range:'3–4 yrs',  cnt:bands[3].cnt, roles:'Engineer, Analyst, Associate'},
   ];
   document.getElementById('pyr-exp-tbody').innerHTML=expData.map(r=>`<tr>
     <td><strong>${r.band}</strong></td>
     <td style="font-weight:700;color:var(--navy)">${r.cnt}</td>
-    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">${r.minExp}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">${r.range}</td>
     <td style="font-size:11px;color:var(--muted)">${r.roles}</td>
   </tr>`).join('');
 }
@@ -1055,7 +1054,7 @@ function filterModal(btn,c,fs){
   if(existing) existing.replaceWith(tmp.firstElementChild);
 }
 function buildModTable(rows){
-  let html=`<table class="dt" style="width:100%"><thead><tr><th>#</th><th>Client Req ID</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Resource</th><th>DoJ / Expected</th><th>Status</th></tr></thead><tbody>`;
+  let html=`<table class="dt" style="width:100%"><thead><tr><th>#</th><th>Client Req ID</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Resource</th><th>Exp. Onboarding</th><th>Status</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     html+=`<tr>
       <td style="color:var(--muted)">${r.sno}</td>
@@ -1063,7 +1062,7 @@ function buildModTable(rows){
       <td>${r.role}</td>
       <td style="font-size:11.5px">${r.hm||'—'}</td>
       <td>${r.res||'<span style="color:var(--muted)">TBD</span>'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px">${(r.doj||r.ej||'—').replace(' 00:00:00','')}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${(r.ej||'—').replace(' 00:00:00','')}</td>
       <td>${fsBadge(r.fs)}</td>
     </tr>`;
   });
@@ -1265,7 +1264,7 @@ function renderDrill(key){
     else rows=[...rows].sort((a,b)=>(order[a.fs]||0)-(order[b.fs]||0));
     const bodyEl=document.getElementById('drill-'+key+'-body');
     let html=`<table class="dt" style="width:100%"><thead><tr>
-      <th>Client Req ID</th><th>Resource</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Status</th><th>Exp. Join</th>`;
+      <th>Client Req ID</th><th>Resource</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Status</th><th>Exp. Onboarding</th>`;
     if(key==='bgv') html+=`<th>BGV Stg 1</th><th>BGV Stg 2</th>`;
     html+=`</tr></thead><tbody>`;
     rows.forEach(r=>{
@@ -1275,7 +1274,7 @@ function renderDrill(key){
         <td style="font-size:11.5px">${r.role}</td>
         <td style="font-size:11.5px">${r.hm||'—'}</td>
         <td>${fsBadge(r.fs)}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px">${(r.doj||r.ej||'—').replace(' 00:00:00','')}</td>`;
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${(r.ej||'—').replace(' 00:00:00','')}</td>`;
       if(key==='bgv') html+=`<td>${bgvB(r.b1)}</td><td>${bgvB(r.b2)}</td>`;
       html+=`</tr>`;
     });
