@@ -179,6 +179,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .dept-act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .dept-act-card{border-radius:9px;border:1px solid var(--border);background:#FAFCFF;padding:10px 13px}
 .dept-act-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+/* Dept status bar — clickable Done/InProgress/Open */
+.dept-status-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.dst-btn{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;border:1.5px solid transparent;cursor:pointer;transition:all .15s;user-select:none;white-space:nowrap}
+.dst-btn.done  {background:var(--greenlt);color:var(--green);border-color:var(--green)}
+.dst-btn.wip   {background:var(--amberlt);color:var(--amber);border-color:var(--amber)}
+.dst-btn.open  {background:#F1F5F9;color:var(--muted);border-color:#CBD5E1}
+.dst-btn.done.active  {background:var(--green);color:#fff}
+.dst-btn.wip.active   {background:var(--amber);color:#fff}
+.dst-btn.open.active  {background:var(--muted);color:#fff}
+.dept-detail{margin-top:6px;border-top:1px solid var(--border);padding-top:6px}
 
 /* ONBOARDING SECTION */
 .onb-section{margin-bottom:14px}
@@ -192,22 +202,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <header class="hdr">
   <div class="hdr-left">
     <svg viewBox="0 0 230 52" xmlns="http://www.w3.org/2000/svg" style="height:42px;width:auto;display:block;flex-shrink:0">
-  <!-- "a" mark — all white -->
-  <!-- Outer ring body -->
-  <circle cx="26" cy="26" r="22" fill="none" stroke="#ffffff" stroke-width="7"/>
-  <!-- Inner cutout arc creating open letterform -->
-  <path d="M 15 34 C 14 40 19 47 26 47 C 33 47 40 41 41 34" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
-  <!-- Stem bar of 'a' -->
-  <line x1="40" y1="15" x2="40" y2="38" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
-  <!-- Floating accent dot -->
-  <circle cx="47" cy="6" r="4" fill="#ffffff"/>
+  <!-- Anblicks "a" swirl mark — 4 separate elements for a clean "@"-style glyph -->
+  <!-- 1. Outer C-arc: from stem-top (40,13), sweeps counterclockwise all the way around, ends at stem-bottom-outer (44,30) -->
+  <path d="M 40 13 C 39 4,28 -1,17 3 C 5 7,-1 18,1 30 C 3 42,13 50,25 49 C 37 48,44 39,44 30"
+        fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- 2. Inner bowl: near-complete oval (the "a" inside "@"), runs counterclockwise from (41,30) back to (41,30) -->
+  <path d="M 41 30 C 41 38,34 44,24 44 C 14 44,9 37,9 29 C 9 21,15 15,24 15 C 33 15,41 21,41 30"
+        fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- 3. Vertical stem: right side shared edge, top of stem to bottom -->
+  <line x1="41" y1="13" x2="41" y2="30" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- 4. Tail: small curl curving upward-right from top of stem -->
+  <path d="M 41 13 C 42 9,46 7,50 7" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
   <!-- "anblicks" wordmark — white -->
-  <text x="60" y="31" font-family="'Segoe UI','DM Sans','Helvetica Neue',Arial,sans-serif"
+  <text x="63" y="31" font-family="'Segoe UI','DM Sans','Helvetica Neue',Arial,sans-serif"
         font-size="21" font-weight="400" fill="#ffffff" letter-spacing="0.4">anblicks</text>
-  <!-- Red accent dot over 'i' replaced with white dot -->
-  <circle cx="119" cy="13" r="3.2" fill="rgba(255,255,255,0.9)"/>
+  <!-- White dot over 'i' -->
+  <circle cx="122" cy="13" r="3.2" fill="rgba(255,255,255,0.9)"/>
   <!-- Tagline -->
-  <text x="60" y="46" font-family="'Segoe UI','DM Sans','Helvetica Neue',Arial,sans-serif"
+  <text x="63" y="46" font-family="'Segoe UI','DM Sans','Helvetica Neue',Arial,sans-serif"
         font-size="7.5" font-weight="700" fill="rgba(255,255,255,0.65)" letter-spacing="1.6">UNLEASH YOUR DATA</text>
 </svg>
     <div class="logo-div"></div>
@@ -407,22 +419,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
   </div>
 
-  <!-- 4. HR & BGV / ONBOARDING -->
+  <!-- 4. HR BGV COMPLETION -->
   <div class="card s2" id="c-hr">
     <div class="card-hdr" onclick="tog('hr')">
-      <div class="card-title"><span class="kn" style="background:#B45309">4</span>HR &amp; Onboarding | BGV Completion</div>
+      <div class="card-title"><span class="kn" style="background:#B45309">4</span>HR | BGV Completion</div>
       <span class="chev">▼</span>
     </div>
     <div class="cbody" id="b-hr">
       <div class="bgv-sum" id="bgv-sum"></div>
       <div class="tbar">
-        <button class="tbtn on" onclick="swt('hr','p1',this)">✅ Onboarded</button>
+        <button class="tbtn on" onclick="swt('hr','dept',this)">📂 Dept Action Items</button>
+        <button class="tbtn" onclick="swt('hr','p1',this)">✅ Onboarded</button>
         <button class="tbtn" onclick="swt('hr','p2',this)">📋 Offer Accepted</button>
         <button class="tbtn" onclick="swt('hr','p3',this)">🔄 WIP</button>
-        <button class="tbtn" onclick="swt('hr','act',this)">HR Activities</button>
-        <button class="tbtn" onclick="swt('hr','dept',this)">HR / IT / L&D / Program</button>
       </div>
-      <div id="hr-p1" class="tpanel on">
+      <div id="hr-dept" class="tpanel on">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Action items grouped by department — click status badges to drill down</div>
+        <div class="dept-act-grid" id="dept-act-grid"></div>
+      </div>
+      <div id="hr-p1" class="tpanel">
         <div class="onb-phase-hdr" style="background:var(--greenlt);color:var(--green)">✅ Onboarded Resources</div>
         <table class="dt"><thead><tr><th>Resource</th><th>Role</th><th>Acxiom Hiring Manager</th><th>BGV Stg 1</th><th>BGV Stg 2</th></tr></thead>
         <tbody id="bgv-p1"></tbody></table>
@@ -437,13 +452,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <table class="dt"><thead><tr><th>Client Req ID</th><th>Role</th><th>Acxiom Hiring Manager</th><th>Exp. Onboarding</th><th>BGV Stg 1</th><th>BGV Stg 2</th></tr></thead>
         <tbody id="bgv-p3"></tbody></table>
       </div>
-      <div id="hr-act" class="tpanel">
-        <ul class="tl" id="hr-act-list"></ul>
+    </div>
+  </div>
+
+  <!-- 4b. ONBOARDING ACTIVITIES (separate collapsible section) -->
+  <div class="card s2" id="c-onb">
+    <div class="card-hdr" onclick="tog('onb')">
+      <div class="card-title"><span class="kn" style="background:#0284C7">4b</span>Onboarding Activities</div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b-onb" style="display:none">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Resource onboarding journey — Week 1 through Month 3</div>
+      <div class="tbar">
+        <button class="tbtn on" onclick="filterOnbList('all',this)">All</button>
+        <button class="tbtn" onclick="filterOnbList('Done',this)">✅ Done</button>
+        <button class="tbtn" onclick="filterOnbList('InProgress',this)">🔄 In Progress</button>
+        <button class="tbtn" onclick="filterOnbList('Open',this)">⭕ Open</button>
       </div>
-      <div id="hr-dept" class="tpanel">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Action items grouped into HR, IT, L&D and Program</div>
-        <div class="dept-act-grid" id="dept-act-grid"></div>
-      </div>
+      <ul class="tl" id="onb-act-list"></ul>
     </div>
   </div>
 
@@ -878,7 +904,8 @@ function renderDeptActionItems(filtered){
     {key:'IT',                 label:'IT & Infrastructure',  color:'var(--amber)',  icon:'💻', coe:'Cloudops'},
     {key:'RMG',                label:'RMG / HR',              color:'#B45309',       icon:'👥', coe:'PMO'},
     {key:'Program Management', label:'Program Management',   color:'var(--navy)',   icon:'📋', coe:'PMO'},
-    {key:'HR',                 label:'HR & Onboarding',      color:'#0369A1',       icon:'🏢', coe:'PMO'},
+    {key:'HR',                 label:'HR',                   color:'#0369A1',       icon:'🏢', coe:'PMO'},
+    {key:'Onboarding',         label:'Onboarding',           color:'#0284C7',       icon:'🎓', coe:'PMO'},
     {key:'Finance',            label:'Finance',               color:'#15803D',       icon:'💰', coe:'PMO'},
     {key:'Facilities',         label:'Facilities',            color:'#7C3AED',       icon:'🏗️', coe:'PMO'},
     {key:'Operations',         label:'Operations',            color:'#BE185D',       icon:'⚙️', coe:'PMO'},
@@ -891,6 +918,12 @@ function renderDeptActionItems(filtered){
     .map(cfg=>{
       const rows=aiRows.filter(r=>r.r===cfg.key);
       if(!rows.length) return '';
+      // Count by status for the summary bar
+      const cntDone=rows.filter(r=>r.s==='Done').length;
+      const cntWip =rows.filter(r=>r.s==='InProgress').length;
+      const cntOpen=rows.filter(r=>r.s==='Open').length;
+      const cardId ='dac-'+cfg.key.replace(/[^a-zA-Z0-9]/g,'-');
+
       const itemsHtml=rows.map(r=>{
         const sColor=r.s==='Done'?'var(--green)':r.s==='InProgress'?'var(--amber)':'var(--muted)';
         const sBg   =r.s==='Done'?'var(--greenlt)':r.s==='InProgress'?'var(--amberlt)':'#F1F5F9';
@@ -899,7 +932,7 @@ function renderDeptActionItems(filtered){
         const areaStr=r.area?'<span style="font-size:10px;color:var(--teal);font-style:italic;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+r.area+'">📋 '+r.area+'</span>':'';
         const respStr=r.o?'<span style="font-size:10.5px;color:var(--muted)">👤 '+r.o+'</span>':'';
         const sBadgeEl='<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:'+sBg+';color:'+sColor+'">'+r.s+'</span>';
-        return '<li style="list-style:none;padding:7px 0;border-bottom:1px solid var(--border)">'+
+        return '<li data-status="'+r.s+'" style="list-style:none;padding:7px 0;border-bottom:1px solid var(--border)">'+
           '<div style="display:flex;align-items:flex-start;gap:6px">'+
             '<span style="color:'+sColor+';font-size:11px;margin-top:2px;flex-shrink:0">'+sIcon+'</span>'+
             '<div style="flex:1;min-width:0">'+
@@ -911,15 +944,43 @@ function renderDeptActionItems(filtered){
           '</div>'+
         '</li>';
       }).join('');
-      return '<div class="dept-act-card">'+
+      return '<div class="dept-act-card" id="'+cardId+'" data-filter="">'+
         '<div class="dept-act-title" style="color:'+cfg.color+'">'+cfg.icon+' '+cfg.label+
           ' <span style="font-size:9px;font-weight:400;color:var(--muted);">'+rows.length+' items</span></div>'+
-        '<ul style="margin:0;padding:0">'+itemsHtml+'</ul>'+
+        '<div class="dept-status-bar">'+
+          (cntDone?'<span class="dst-btn done" data-status="Done"       onclick="filterDeptCard(\''+cardId+'\',\'Done\',this)">✅ Done: '+cntDone+'</span>':'')+
+          (cntWip ?'<span class="dst-btn wip"  data-status="InProgress" onclick="filterDeptCard(\''+cardId+'\',\'InProgress\',this)">🔄 In Prog: '+cntWip+'</span>':'')+
+          (cntOpen?'<span class="dst-btn open" data-status="Open"       onclick="filterDeptCard(\''+cardId+'\',\'Open\',this)">⭕ Open: '+cntOpen+'</span>':'')+
+        '</div>'+
+        '<div class="dept-detail" id="'+cardId+'-detail" style="display:none">'+
+          '<ul style="margin:0;padding:0">'+itemsHtml+'</ul>'+
+        '</div>'+
       '</div>';
     }).filter(Boolean).join('');
 
   document.getElementById('dept-act-grid').innerHTML=
     cards||'<div style="color:var(--muted);font-size:12px;padding:8px">No action items for current filter.</div>';
+}
+
+// Drill-down by status — click same button again to collapse
+function filterDeptCard(cardId, status, btn){
+  const card  =document.getElementById(cardId);
+  const detail=document.getElementById(cardId+'-detail');
+  if(!card||!detail) return;
+  const prev=card.dataset.filter;
+  if(prev===status){
+    detail.style.display='none';
+    card.dataset.filter='';
+    card.querySelectorAll('.dst-btn').forEach(b=>b.classList.remove('active'));
+    return;
+  }
+  card.dataset.filter=status;
+  card.querySelectorAll('.dst-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  Array.from(detail.querySelectorAll('li[data-status]')).forEach(li=>{
+    li.style.display=li.dataset.status===status?'':'none';
+  });
+  detail.style.display='block';
 }
 
 function renderHR(){
@@ -937,12 +998,13 @@ function renderHR(){
   const p3Rows=d.filter(r=>r.fs==='1.WIP');
   _p3Rows=p3Rows; WIP_COH_FILTER='all';
   renderWIPTable(p3Rows);
-  // Update tab labels
-  document.querySelectorAll('#b-hr .tbtn')[0].textContent=`✅ Onboarded (${p1Rows.length})`;
-  document.querySelectorAll('#b-hr .tbtn')[1].textContent=`📋 Offer Accepted (${p2Rows.length})`;
-  document.querySelectorAll('#b-hr .tbtn')[2].textContent=`🔄 WIP (${p3Rows.length})`;
+  // Update tab labels (index 0 = Dept Action Items, 1-3 = BGV phases)
+  document.querySelectorAll('#b-hr .tbtn')[1].textContent=`✅ Onboarded (${p1Rows.length})`;
+  document.querySelectorAll('#b-hr .tbtn')[2].textContent=`📋 Offer Accepted (${p2Rows.length})`;
+  document.querySelectorAll('#b-hr .tbtn')[3].textContent=`🔄 WIP (${p3Rows.length})`;
 
-  document.getElementById('hr-act-list').innerHTML=[
+  // Populate Onboarding Activities section (separate card 4b)
+  _ONB_ITEMS=[
     ['Resources Joined & Laptops Handed Over','InProgress','Dhaval R.'],
     ['Onboarding & Overview Trainings – Week 1 (C1)','Done','Deb S.'],
     ['Boot Camp (HR Overview, Compliance) – Week 2 & 3','InProgress','Deb S.'],
@@ -952,8 +1014,22 @@ function renderHR(){
     ['Shadow Actual Project – Month 2','Open','Chintan M.'],
     ['Transition to Hands-on Roles – Month 3','Open','Chintan M.'],
     ['Track Performance of New Hires','Open','Chintan M.'],
-  ].map(([l,s,o])=>tli(l,s,o)).join('');
+  ];
+  filterOnbList('all',null);
   renderDeptActionItems(d);
+}
+
+// Onboarding activity list filter
+let _ONB_ITEMS=[];
+function filterOnbList(f, btn){
+  const el=document.getElementById('onb-act-list');
+  if(!el) return;
+  if(btn){
+    document.querySelectorAll('#b-onb .tbtn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+  }
+  const rows=f==='all'?_ONB_ITEMS:_ONB_ITEMS.filter(([,s])=>s===f);
+  el.innerHTML=rows.map(([l,s,o])=>tli(l,s,o)).join('');
 }
 
 // ─── Program detail row renderer (global so toggles can call it) ─────────────
@@ -1128,7 +1204,7 @@ function setHMF(v,btn){
 }
 
 // ═══════════════════ COLLAPSE ═══════════════════
-const CS={hiring:true,ld:true,it:true,hr:true,prog:true};
+const CS={hiring:true,ld:true,it:true,hr:true,onb:false,prog:true};
 function tog(id){
   CS[id]=!CS[id];
   document.getElementById('b-'+id).style.display=CS[id]?'block':'none';
