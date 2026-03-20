@@ -420,32 +420,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <span class="chev">▼</span>
     </div>
     <div class="cbody" id="b-prog">
-      <!-- Executive Summary Row -->
-      <div style="display:flex;align-items:center;gap:20px;margin-bottom:14px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:13px">
-          <div class="dring">
-            <svg width="76" height="76" viewBox="0 0 76 76">
-              <circle cx="38" cy="38" r="30" fill="none" stroke="#EEF2F5" stroke-width="8"/>
-              <circle id="darc" cx="38" cy="38" r="30" fill="none" stroke="var(--teal)" stroke-width="8"
-                stroke-linecap="round" stroke-dasharray="0 189" style="transition:stroke-dasharray .8s"/>
-            </svg>
-            <div class="dcen"><div class="dpct" id="dpct">–</div><div class="dlbl">Complete</div></div>
-          </div>
-          <div>
-            <div style="font-size:19px;font-weight:700;color:var(--navy)" id="prog-frac"></div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px">tasks completed</div>
-          </div>
-        </div>
-        <div class="srow" style="margin:0" id="prog-pills"></div>
-      </div>
-      <!-- Workstream Bars -->
-      <div id="prog-bars" style="margin-bottom:14px"></div>
-      <!-- Key Alerts -->
-      <div id="prog-alerts" style="margin-bottom:14px"></div>
-      <!-- In-Progress Spotlight -->
-      <div id="prog-spotlight" style="margin-bottom:10px"></div>
-      <!-- Upcoming ETAs -->
-      <div id="prog-upcoming" style="margin-bottom:10px"></div>
+      <!-- Executive header: donut + RAG + KPI tiles -->
+      <div id="prog-exec-header" style="margin-bottom:14px"></div>
+      <!-- Workstream health cards -->
+      <div id="prog-ws-grid" style="margin-bottom:12px"></div>
+      <!-- Attention + Milestones row -->
+      <div id="prog-bottom-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px"></div>
       <!-- Expand toggle -->
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
         <button id="prog-expand-btn" onclick="toggleProgDetail()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:5px 14px;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:center">▸ Show Full Detail</button>
@@ -1040,36 +1020,68 @@ function _renderProgRows(filt){
 // ═══════════════════ 5. PROGRAM ═══════════════════
 function renderProg(){
   const done=PROG_C1.filter(r=>r.s==='Done').length;
-  const inp=PROG_C1.filter(r=>r.s==='InProgress').length;
+  const inp =PROG_C1.filter(r=>r.s==='InProgress').length;
   const open=PROG_C1.filter(r=>r.s==='Open').length;
   const total=PROG_C1.length;
   const pct=Math.round(done/total*100);
-
-  // ── Donut + fraction ──
-  document.getElementById('dpct').textContent=pct+'%';
-  document.getElementById('prog-frac').innerHTML=`${done} <span style="font-size:13px;font-weight:400;color:var(--muted)">of ${total}</span>`;
-  setTimeout(()=>{const c=2*Math.PI*30;document.getElementById('darc').setAttribute('stroke-dasharray',(c*pct/100)+' '+(c*(1-pct/100)));},400);
-
-  // ── Dynamic RAG health badge ──
   const today=new Date().toISOString().slice(0,10);
   const overdue=PROG_C1.filter(r=>r.s!=='Done'&&r.e&&r.e<today&&/^\d{4}/.test(r.e));
-  const rag = overdue.length>3||pct<30
-    ? {bg:'#FEE2E2',border:'#FCA5A5',text:'#DC2626',icon:'🔴',lbl:'At Risk'}
-    : overdue.length>0||pct<60
-      ? {bg:'#FEF3C7',border:'#FCD34D',text:'#B45309',icon:'🟡',lbl:'Needs Attention'}
-      : {bg:'#D1FAE5',border:'#6EE7B7',text:'#065F46',icon:'🟢',lbl:'On Track'};
+  const rag=overdue.length>3||pct<30
+    ?{bg:'#FEE2E2',border:'#FCA5A5',text:'#DC2626',icon:'🔴',lbl:'At Risk'}
+    :overdue.length>0||pct<60
+      ?{bg:'#FEF3C7',border:'#FCD34D',text:'#B45309',icon:'🟡',lbl:'Needs Attention'}
+      :{bg:'#D1FAE5',border:'#6EE7B7',text:'#065F46',icon:'🟢',lbl:'On Track'};
 
-  // ── Pills row with RAG ──
-  document.getElementById('prog-pills').innerHTML=
-    `<div style="display:inline-flex;align-items:center;gap:5px;background:${rag.bg};border:1.5px solid ${rag.border};border-radius:20px;padding:5px 12px;margin-right:6px">
-       <span style="font-size:13px">${rag.icon}</span>
-       <span style="font-size:12px;font-weight:700;color:${rag.text}">${rag.lbl}</span>
-     </div>`+
-    `<div class="sp" style="background:var(--greenlt);min-width:52px"><div class="n" style="color:var(--green);font-size:18px">${done}</div><div class="l" style="color:var(--green)">Done</div></div>`+
-    `<div class="sp" style="background:var(--amberlt);min-width:52px"><div class="n" style="color:var(--amber);font-size:18px">${inp}</div><div class="l" style="color:var(--amber)">In Progress</div></div>`+
-    `<div class="sp" style="background:#F1F5F9;min-width:52px"><div class="n" style="color:var(--muted);font-size:18px">${open}</div><div class="l" style="color:var(--muted)">Open</div></div>`;
+  // ── Donut arc ──
+  const C=2*Math.PI*30;
+  const arc=C*pct/100;
 
-  // ── Workstream bars — % with RAG color coding ──
+  // ── Exec header: donut + RAG + KPI tiles ──
+  document.getElementById('prog-exec-header').innerHTML=
+    `<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+       <div style="position:relative;width:80px;height:80px;flex-shrink:0">
+         <svg width="80" height="80" viewBox="0 0 80 80">
+           <circle cx="40" cy="40" r="32" fill="none" stroke="#EEF2F5" stroke-width="9"/>
+           <circle id="darc" cx="40" cy="40" r="32" fill="none" stroke="${rag.text}" stroke-width="9"
+             stroke-linecap="round"
+             stroke-dasharray="${arc*(32/30)} ${(C*(32/30))-arc*(32/30)}"
+             transform="rotate(-90 40 40)" style="transition:stroke-dasharray .8s"/>
+         </svg>
+         <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+           <div style="font-size:15px;font-weight:800;color:${rag.text};line-height:1">${pct}%</div>
+           <div style="font-size:8px;color:var(--muted);margin-top:1px">complete</div>
+         </div>
+       </div>
+       <div style="flex:1;min-width:220px">
+         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+           <div style="display:inline-flex;align-items:center;gap:5px;background:${rag.bg};border:1.5px solid ${rag.border};border-radius:20px;padding:4px 13px">
+             <span>${rag.icon}</span>
+             <span style="font-size:12.5px;font-weight:700;color:${rag.text}">${rag.lbl}</span>
+           </div>
+           <span style="font-size:11.5px;color:var(--muted)">${done} of ${total} tasks completed</span>
+         </div>
+         <div style="display:flex;gap:8px;flex-wrap:wrap">
+           <div style="background:var(--greenlt);border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+             <div style="font-size:20px;font-weight:700;color:var(--green);line-height:1">${done}</div>
+             <div style="font-size:9.5px;color:var(--green);margin-top:2px">✅ Done</div>
+           </div>
+           <div style="background:var(--amberlt);border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+             <div style="font-size:20px;font-weight:700;color:var(--amber);line-height:1">${inp}</div>
+             <div style="font-size:9.5px;color:var(--amber);margin-top:2px">🔄 Active</div>
+           </div>
+           <div style="background:#F1F5F9;border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+             <div style="font-size:20px;font-weight:700;color:var(--muted);line-height:1">${open}</div>
+             <div style="font-size:9.5px;color:var(--muted);margin-top:2px">⭕ Open</div>
+           </div>
+           ${overdue.length>0?`<div style="background:#FEE2E2;border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+             <div style="font-size:20px;font-weight:700;color:#DC2626;line-height:1">${overdue.length}</div>
+             <div style="font-size:9.5px;color:#DC2626;margin-top:2px">⚠️ Overdue</div>
+           </div>`:''}
+         </div>
+       </div>
+     </div>`;
+
+  // ── Workstream health cards ──
   const WS=[
     {l:'Preparation & Contracts', icon:'📄', keys:['preparation','finalize offshore','local leadership','sign contract']},
     {l:'IT Infrastructure',       icon:'💻', keys:['infrastructure','security','identity','endpoint','network','application control','data protection','logging','user support','laptop','golden image','vdi','day-0']},
@@ -1081,110 +1093,76 @@ function renderProg(){
     const items=PROG_C1.filter(r=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
     const d=items.filter(r=>r.s==='Done').length;
     const ip=items.filter(r=>r.s==='InProgress').length;
+    const op=items.filter(r=>r.s==='Open').length;
     const t=items.length||1;
     const p=Math.round(d/t*100);
     const col=p>=70?'var(--green)':p>=30?'var(--amber)':'#EF4444';
-    return{...w,d,ip,t,p,col};
+    const rag=p>=70?'🟢':p>=30?'🟡':'🔴';
+    return{...w,d,ip,op,t,p,col,rag};
   });
-  document.getElementById('prog-bars').innerHTML=wsStats.map(w=>`
-    <div class="pi" style="align-items:center">
-      <div class="pl" style="display:flex;align-items:center;gap:4px"><span>${w.icon}</span>${w.l}</div>
-      <div class="pbw">
-        <div class="pw">
-          <div class="pf" style="width:${w.p}%;background:${w.col}"></div>
-        </div>
-      </div>
-      <div class="pc" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
-        <span style="font-weight:700;color:${w.col};font-family:'DM Mono',monospace;font-size:11px">${w.p}%</span>
-        <span style="font-size:9.5px;color:var(--muted)">${w.d}/${w.t} done</span>
-      </div>
-    </div>`).join('');
+  document.getElementById('prog-ws-grid').innerHTML=
+    `<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Workstream Health</div>`+
+    `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">`+
+    wsStats.map(w=>
+      `<div style="background:#F8FAFC;border:1px solid var(--border);border-left:3px solid ${w.col};border-radius:0 8px 8px 0;padding:9px 11px">
+         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+           <span style="font-size:11.5px;font-weight:600;color:var(--text)">${w.icon} ${w.l}</span>
+           <span style="font-size:12px">${w.rag}</span>
+         </div>
+         <div class="pw" style="margin-bottom:4px"><div class="pf" style="width:${w.p}%;background:${w.col}"></div></div>
+         <div style="display:flex;justify-content:space-between;align-items:center">
+           <span style="font-size:9.5px;color:var(--muted)">${w.d} done · ${w.ip} active · ${w.op} open</span>
+           <span style="font-size:11px;font-weight:700;color:${w.col};font-family:'DM Mono',monospace">${w.p}%</span>
+         </div>
+       </div>`
+    ).join('')+`</div>`;
 
-  // ── shared mini-table renderer ──
-  function miniTbl(cols,rows,accentCol,emptyMsg){
-    if(!rows.length) return emptyMsg?`<div style="font-size:12px;color:var(--muted);padding:6px 0">${emptyMsg}</div>`:'';
-    const th=cols.map(c=>`<th style="padding:5px 8px;font-size:10px;font-weight:700;color:${accentCol};text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;border-bottom:2px solid currentColor;background:none">${c}</th>`).join('');
-    const trs=rows.map((cells,i)=>{
-      const bg=i%2===0?'transparent':'rgba(0,0,0,.025)';
-      return`<tr style="background:${bg}">${cells.map(c=>`<td style="padding:5px 8px;font-size:11.5px;vertical-align:middle">${c}</td>`).join('')}</tr>`;
-    }).join('');
-    return`<table style="width:100%;border-collapse:collapse;border-radius:7px;overflow:hidden"><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>`;
-  }
-
-  // ── Past ETA (Overdue) ──
-  const alertEl=document.getElementById('prog-alerts');
-  if(overdue.length>0){
-    const dayMs=86400000;
-    const todayD=new Date(today);
-    const rows=overdue.map(r=>{
-      const daysOver=Math.round((todayD-new Date(r.e))/dayMs);
-      const ws=WS.find(w=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
-      const wsLbl=ws?ws.icon:'📌';
-      return[
-        `${wsLbl} <span style="font-weight:500">${r.a.length>55?r.a.slice(0,55)+'…':r.a}</span>`,
-        `<span style="color:var(--muted)">${r.o||r.r||'—'}</span>`,
-        `<span style="font-family:'DM Mono',monospace;font-size:11px;color:#B45309">${r.e}</span>`,
-        `<span style="background:#FEE2E2;color:#DC2626;font-family:'DM Mono',monospace;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:4px">+${daysOver}d</span>`
-      ];
-    });
-    alertEl.innerHTML=
-      `<div style="border-left:3px solid #EF4444;padding:8px 12px;background:#FEF2F2;border-radius:0 7px 7px 0;margin-bottom:8px">`+
-      `<div style="font-size:10.5px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚠️ Past ETA — ${overdue.length} item${overdue.length>1?'s':''} need action</div>`+
-      miniTbl(['Activity','Owner','ETA','Overdue'],rows,'#DC2626')+
-      `</div>`;
-  } else { alertEl.innerHTML=''; }
-
-  // ── In Progress: clean table sorted by ETA ──
-  const inpItems=PROG_C1.filter(r=>r.s==='InProgress')
-    .sort((a,b)=>(a.e||'9999').localeCompare(b.e||'9999'));
-  const spotEl=document.getElementById('prog-spotlight');
-  if(inpItems.length>0){
-    const rows=inpItems.map(r=>{
-      const ws=WS.find(w=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
-      const wsLbl=ws?ws.icon+' '+ws.l:'📌 Other';
-      const etaStr=r.e&&/^\d{4}/.test(r.e)?r.e:'—';
-      const etaStyle=r.e&&r.e<today?'color:#DC2626;font-weight:600':'color:var(--teal)';
-      return[
-        `<span style="font-weight:500">${r.a.length>55?r.a.slice(0,55)+'…':r.a}</span>`,
-        `<span style="color:var(--muted)">${r.o||r.r||'—'}</span>`,
-        `<span style="font-family:'DM Mono',monospace;font-size:11px;${etaStyle}">${etaStr}</span>`,
-        `<span style="font-size:10px;color:var(--muted)">${wsLbl}</span>`
-      ];
-    });
-    spotEl.innerHTML=
-      `<div style="border-left:3px solid var(--amber);padding:8px 12px;background:#FFFBEB;border-radius:0 7px 7px 0;margin-bottom:8px">`+
-      `<div style="font-size:10.5px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔄 In Progress — ${inpItems.length} items</div>`+
-      miniTbl(['Activity','Owner','ETA','Workstream'],rows,'var(--amber)')+
-      `</div>`;
-  } else { spotEl.innerHTML=''; }
-
-  // ── Next Due: upcoming items sorted by ETA ──
-  const upcoming=PROG_C1.filter(r=>r.s!=='Done'&&r.e&&r.e>today&&/^\d{4}/.test(r.e))
-    .sort((a,b)=>a.e.localeCompare(b.e)).slice(0,8);
-  const upEl=document.getElementById('prog-upcoming');
-  if(upEl){
-    if(upcoming.length>0){
-      const rows=upcoming.map(r=>{
+  // ── Attention: top overdue (max 3) ──
+  const attRows=overdue.slice(0,3);
+  const dayMs=86400000;
+  const todayD=new Date(today);
+  const attHtml=overdue.length===0
+    ?`<div style="font-size:11.5px;color:var(--green);padding:8px 0">✅ No overdue items</div>`
+    :`<table style="width:100%;border-collapse:collapse">`+
+      attRows.map((r,i)=>{
+        const d=Math.round((todayD-new Date(r.e))/dayMs);
         const ws=WS.find(w=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
-        const wsLbl=ws?ws.icon+' '+ws.l:'📌 Other';
-        const statusBadge=r.s==='InProgress'
-          ?'<span style="background:var(--amberlt);color:var(--amber);font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:4px">In Progress</span>'
-          :'<span style="background:#F1F5F9;color:var(--muted);font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:4px">Open</span>';
-        return[
-          `<span style="font-weight:500">${r.a.length>55?r.a.slice(0,55)+'…':r.a}</span>`,
-          `<span style="color:var(--muted)">${r.o||r.r||'—'}</span>`,
-          `<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--navy)">${r.e}</span>`,
-          statusBadge,
-          `<span style="font-size:10px;color:var(--muted)">${wsLbl}</span>`
-        ];
-      });
-      upEl.innerHTML=
-        `<div style="border-left:3px solid var(--teal);padding:8px 12px;background:#F0FAFB;border-radius:0 7px 7px 0;margin-bottom:8px">`+
-        `<div style="font-size:10.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📅 Next Due — coming up</div>`+
-        miniTbl(['Activity','Owner','ETA','Status','Workstream'],rows,'var(--teal)')+
-        `</div>`;
-    } else { upEl.innerHTML=''; }
-  }
+        return`<tr style="border-bottom:1px solid #FEE2E2">
+          <td style="padding:5px 0 5px 0;font-size:11.5px;color:#78350F">${ws?ws.icon:''} ${r.a.length>42?r.a.slice(0,42)+'…':r.a}</td>
+          <td style="padding:5px 0;font-size:10.5px;color:var(--muted);white-space:nowrap;padding-left:6px">${r.o||r.r||'—'}</td>
+          <td style="padding:5px 0;white-space:nowrap;padding-left:6px"><span style="background:#FEE2E2;color:#DC2626;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace">+${d}d</span></td>
+        </tr>`;
+      }).join('')+
+      (overdue.length>3?`<tr><td colspan="3" style="padding-top:5px;font-size:10.5px;color:var(--muted);font-style:italic">+${overdue.length-3} more — see full detail</td></tr>`:'')+
+      `</table>`;
+
+  // ── Next milestones: next 5 upcoming ──
+  const upcoming=PROG_C1.filter(r=>r.s!=='Done'&&r.e&&r.e>=today&&/^\d{4}/.test(r.e))
+    .sort((a,b)=>a.e.localeCompare(b.e)).slice(0,5);
+  const tlHtml=upcoming.length===0
+    ?`<div style="font-size:11.5px;color:var(--muted);padding:8px 0">No upcoming items</div>`
+    :`<table style="width:100%;border-collapse:collapse">`+
+      upcoming.map((r,i)=>{
+        const ws=WS.find(w=>w.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)));
+        const statCol=r.s==='InProgress'?'var(--amber)':'var(--muted)';
+        const statIcon=r.s==='InProgress'?'🔄':'⭕';
+        return`<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:5px 0;font-size:11.5px">${ws?ws.icon:''} ${r.a.length>40?r.a.slice(0,40)+'…':r.a}</td>
+          <td style="padding:5px 0;font-size:10.5px;color:var(--muted);white-space:nowrap;padding-left:6px">${r.o||r.r||'—'}</td>
+          <td style="padding:5px 0;white-space:nowrap;padding-left:6px"><span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--navy)">${r.e}</span></td>
+        </tr>`;
+      }).join('')+
+      `</table>`;
+
+  document.getElementById('prog-bottom-row').innerHTML=
+    `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px">
+       <div style="font-size:10px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚠️ Past ETA ${overdue.length>0?'('+overdue.length+')':''}</div>
+       ${attHtml}
+     </div>`+
+    `<div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:10px 12px">
+       <div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📅 Next Milestones</div>
+       ${tlHtml}
+     </div>`;
 
   // ── Expand button label ──
   const expBtn=document.getElementById('prog-expand-btn');
@@ -1723,7 +1701,7 @@ function spProcessWorkbook(wb){
         hm:spCell(r,8),  ej:spCell(r,9),   res:name,
         doj:spCell(r,11),loc:spCell(r,12), status:spCell(r,13), fs:fs,
         b1:spCell(r,19), b2:spCell(r,20),  it:spCell(r,23),
-        grade:spCell(r,22), minexp:spCell(r,3), client_req:spCell(r,24)
+        grade:spCell(r,22), minexp:spCell(r,3), client_req:spCell(r,18)
       });
     }
   }
