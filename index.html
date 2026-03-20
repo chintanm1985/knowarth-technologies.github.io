@@ -426,6 +426,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div id="prog-ws-grid" style="margin-bottom:12px"></div>
       <!-- Attention + Milestones row -->
       <div id="prog-bottom-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px"></div>
+      <!-- Drill-down panel (populated on tile/ws click) -->
+      <div id="prog-drill" style="display:none;margin-bottom:12px"></div>
       <!-- Expand toggle -->
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
         <button id="prog-expand-btn" onclick="toggleProgDetail()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:5px 14px;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:center">▸ Show Full Detail</button>
@@ -1061,19 +1063,19 @@ function renderProg(){
            <span style="font-size:11.5px;color:var(--muted)">${done} of ${total} tasks completed</span>
          </div>
          <div style="display:flex;gap:8px;flex-wrap:wrap">
-           <div style="background:var(--greenlt);border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+           <div class="prog-kpi-tile" style="background:var(--greenlt);border-radius:8px;padding:7px 16px;text-align:center;min-width:54px;cursor:pointer;transition:box-shadow .15s" onclick="drillProg('status','Done',this)">
              <div style="font-size:20px;font-weight:700;color:var(--green);line-height:1">${done}</div>
              <div style="font-size:9.5px;color:var(--green);margin-top:2px">✅ Done</div>
            </div>
-           <div style="background:var(--amberlt);border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+           <div class="prog-kpi-tile" style="background:var(--amberlt);border-radius:8px;padding:7px 16px;text-align:center;min-width:54px;cursor:pointer;transition:box-shadow .15s" onclick="drillProg('status','InProgress',this)">
              <div style="font-size:20px;font-weight:700;color:var(--amber);line-height:1">${inp}</div>
              <div style="font-size:9.5px;color:var(--amber);margin-top:2px">🔄 Active</div>
            </div>
-           <div style="background:#F1F5F9;border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+           <div class="prog-kpi-tile" style="background:#F1F5F9;border-radius:8px;padding:7px 16px;text-align:center;min-width:54px;cursor:pointer;transition:box-shadow .15s" onclick="drillProg('status','Open',this)">
              <div style="font-size:20px;font-weight:700;color:var(--muted);line-height:1">${open}</div>
              <div style="font-size:9.5px;color:var(--muted);margin-top:2px">⭕ Open</div>
            </div>
-           ${overdue.length>0?`<div style="background:#FEE2E2;border-radius:8px;padding:7px 16px;text-align:center;min-width:54px">
+           ${overdue.length>0?`<div class="prog-kpi-tile" style="background:#FEE2E2;border-radius:8px;padding:7px 16px;text-align:center;min-width:54px;cursor:pointer;transition:box-shadow .15s" onclick="drillProg('status','overdue',this)">
              <div style="font-size:20px;font-weight:700;color:#DC2626;line-height:1">${overdue.length}</div>
              <div style="font-size:9.5px;color:#DC2626;margin-top:2px">⚠️ Overdue</div>
            </div>`:''}
@@ -1104,7 +1106,7 @@ function renderProg(){
     `<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Workstream Health</div>`+
     `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">`+
     wsStats.map(w=>
-      `<div style="background:#F8FAFC;border:1px solid var(--border);border-left:3px solid ${w.col};border-radius:0 8px 8px 0;padding:9px 11px">
+      `<div class="prog-ws-card" data-ws="${w.l}" style="background:#F8FAFC;border:1px solid var(--border);border-left:3px solid ${w.col};border-radius:0 8px 8px 0;padding:9px 11px;cursor:pointer;transition:box-shadow .15s" onclick="drillProg('ws','${w.l}',this)">
          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
            <span style="font-size:11.5px;font-weight:600;color:var(--text)">${w.icon} ${w.l}</span>
            <span style="font-size:12px">${w.rag}</span>
@@ -1172,6 +1174,87 @@ function renderProg(){
   const _pgTbl=document.getElementById('prog-tbody');
   if(_pgTbl) _pgTbl.setAttribute('data-filter','all');
   _renderProgRows('all');
+}
+
+// ═══════════════════ PROG DRILL-DOWN ═══════════════════
+let _PROG_DRILL=null;
+const _PROG_WS_KEYS=[
+  {l:'Preparation & Contracts', keys:['preparation','finalize offshore','local leadership','sign contract']},
+  {l:'IT Infrastructure',       keys:['infrastructure','security','identity','endpoint','network','application control','data protection','logging','user support','laptop','golden image','vdi','day-0']},
+  {l:'Talent Development',      keys:['talent development','training program','prepare training','acx overview','core work','technology deep','define mentor','identify us mentor','define 30','identify us cohort','build mentor']},
+  {l:'Talent Acquisition',      keys:['talent acquisition','define roles','conduct interview','establish success','jd mapping','jd discussion','interview panel','pipeline velocity']},
+  {l:'Onboarding & Ramp-up',    keys:['onboarding','resources joined','boot camp','introduce to mentor','shadow','transition to hands','track performance','operations & governance','raci','governance dashboard']},
+];
+function drillProg(type, filter, el){
+  const det=document.getElementById('prog-drill');
+  // Deactivate all tiles and ws cards
+  document.querySelectorAll('.prog-kpi-tile,.prog-ws-card').forEach(t=>{
+    t.style.boxShadow='';t.style.outline='';
+  });
+  // Toggle off
+  if(_PROG_DRILL===type+':'+filter){
+    det.style.display='none'; _PROG_DRILL=null; return;
+  }
+  _PROG_DRILL=type+':'+filter;
+  // Highlight active element
+  if(el){ el.style.outline='2.5px solid var(--navy)'; el.style.boxShadow='0 0 0 3px rgba(13,27,62,.1)'; }
+
+  // Build rows
+  const today=new Date().toISOString().slice(0,10);
+  let rows=[];
+  let titleStr='', titleCol='var(--navy)';
+  if(type==='status'){
+    if(filter==='overdue'){
+      rows=PROG_C1.filter(r=>r.s!=='Done'&&r.e&&r.e<today&&/^\d{4}/.test(r.e)).sort((a,b)=>a.e.localeCompare(b.e));
+      titleStr='⚠️ Overdue Items ('+rows.length+')'; titleCol='#DC2626';
+    } else {
+      rows=PROG_C1.filter(r=>r.s===filter).sort((a,b)=>(a.e||'9999').localeCompare(b.e||'9999'));
+      const labels={Done:'✅ Done',InProgress:'🔄 In Progress',Open:'⭕ Open'};
+      const cols={Done:'var(--green)',InProgress:'var(--amber)',Open:'var(--muted)'};
+      titleStr=labels[filter]+' ('+rows.length+')'; titleCol=cols[filter]||'var(--navy)';
+    }
+  } else if(type==='ws'){
+    const ws=_PROG_WS_KEYS.find(w=>w.l===filter);
+    if(ws) rows=PROG_C1.filter(r=>ws.keys.some(k=>r.a.toLowerCase().includes(k)||r.r.toLowerCase().includes(k)))
+             .sort((a,b)=>{const o={Done:2,InProgress:0,Open:1};return(o[a.s]??1)-(o[b.s]??1);});
+    titleStr='📋 '+filter+' ('+rows.length+' items)'; titleCol='var(--navy)';
+  }
+
+  // Render table
+  const statusBadge=s=>s==='Done'
+    ?'<span style="background:var(--greenlt);color:var(--green);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:4px">Done</span>'
+    :s==='InProgress'
+    ?'<span style="background:var(--amberlt);color:var(--amber);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:4px">In Progress</span>'
+    :'<span style="background:#F1F5F9;color:var(--muted);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:4px">Open</span>';
+  const etaStyle=e=>e&&e<today?'color:#DC2626;font-weight:600':'color:var(--teal)';
+
+  const tbody=rows.map((r,i)=>`<tr style="background:${i%2?'rgba(0,0,0,.02)':'transparent'}">
+    <td style="padding:5px 8px;font-size:11.5px;font-weight:500">${r.a.length>60?r.a.slice(0,60)+'…':r.a}</td>
+    <td style="padding:5px 8px;font-size:11px;color:var(--muted)">${r.o||'—'}</td>
+    <td style="padding:5px 8px;font-size:11px;color:var(--muted)">${r.r||'—'}</td>
+    <td style="padding:5px 8px">${statusBadge(r.s)}</td>
+    <td style="padding:5px 8px;font-family:'DM Mono',monospace;font-size:11px" class="${r.e&&r.e<today?'text-red':''}"><span style="${etaStyle(r.e)}">${r.e&&/^\d{4}/.test(r.e)?r.e:'—'}</span></td>
+  </tr>`).join('');
+
+  det.innerHTML=`<div style="border:1.5px solid var(--border);border-top:3px solid ${titleCol};border-radius:0 0 8px 8px;overflow:hidden">
+    <div style="padding:8px 12px;background:#F8FAFC;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:11px;font-weight:700;color:${titleCol};text-transform:uppercase;letter-spacing:.4px">${titleStr}</span>
+      <span style="font-size:10px;color:var(--muted);cursor:pointer" onclick="drillProg('${type}','${filter}',null)">✕ Close</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:1px solid var(--border)">
+          <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--muted);text-align:left;text-transform:uppercase">Activity</th>
+          <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--muted);text-align:left;text-transform:uppercase">Owner</th>
+          <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--muted);text-align:left;text-transform:uppercase">Responsible</th>
+          <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--muted);text-align:left;text-transform:uppercase">Status</th>
+          <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--muted);text-align:left;text-transform:uppercase">ETA</th>
+        </tr></thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    </div>
+  </div>`;
+  det.style.display='block';
 }
 
 function toggleProgDetail(){
@@ -1700,8 +1783,8 @@ function spProcessWorkbook(wb){
         req:spCell(r,1), role:spCell(r,2), exp:spCell(r,3), coe:spCell(r,4),
         hm:spCell(r,8),  ej:spCell(r,9),   res:name,
         doj:spCell(r,11),loc:spCell(r,12), status:spCell(r,13), fs:fs,
-        b1:spCell(r,19), b2:spCell(r,20),  it:spCell(r,23),
-        grade:spCell(r,22), minexp:spCell(r,3), client_req:spCell(r,18)
+        b1:spCell(r,17), b2:spCell(r,18),  it:spCell(r,21),
+        grade:spCell(r,20), minexp:spCell(r,3), client_req:spCell(r,16)
       });
     }
   }
